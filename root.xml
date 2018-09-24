@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <description>
+    An ancestor of all Maven projects with groupId 'stincmale.idenator'.
+  </description>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>stincmale.idenator</groupId>
+  <artifactId>idenator-root</artifactId>
+  <version>0.1.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <name>idenator-root</name>
+  <url>${idenator.url}</url>
+  <licenses>
+    <license>
+      <name>${idenator.licenseName}</name>
+      <url>${idenator.licenseUrl}</url>
+    </license>
+  </licenses>
+  <inceptionYear>${idenator.inceptionYear}</inceptionYear>
+  <organization>
+    <name>${idenator.organizationName}</name>
+    <url>${idenator.organizationUrl}</url>
+  </organization>
+  <properties>
+    <idenator.charset>UTF-8</idenator.charset>
+    <project.build.sourceEncoding>${idenator.charset}</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>${idenator.charset}</project.reporting.outputEncoding>
+    <idenator.url>https://github.com/stIncMale/idenator</idenator.url>
+    <idenator.licenseName>Apache License, Version 2.0</idenator.licenseName>
+    <idenator.licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</idenator.licenseUrl>
+    <idenator.inceptionYear>2018</idenator.inceptionYear>
+    <idenator.organizationName>Valiantsin Kavalenka</idenator.organizationName>
+    <idenator.organizationUrl>https://sites.google.com/site/aboutmale/</idenator.organizationUrl>
+  </properties>
+</project>
+

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <description>
+    Tools for generating identifiers.
+  </description>
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>idenator</artifactId>
+  <packaging>jar</packaging>
+  <name>idenator</name>
+  <parent>
+    <groupId>stincmale.idenator</groupId>
+    <artifactId>idenator-build</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+    <relativePath>../build.xml</relativePath>
+  </parent>
+  <dependencies>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+</project>
+

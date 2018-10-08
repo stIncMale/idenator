@@ -14,16 +14,12 @@
  * limitations under the License.
  */
 
-package stincmale.idenator.internal.util;
+package stincmale.idenator.performance.util;
 
-import java.util.Locale;
+public final class TestTag {
+  public static final String PERFORMANCE = "performance";
 
-public final class Utils {
-  private Utils() {
+  private TestTag() {
     throw new UnsupportedOperationException("The class isn't designed to be instantiated");
-  }
-
-  public static final String format(final String format, final Object... args) {
-    return String.format(Locale.ROOT, format, args);
   }
 }

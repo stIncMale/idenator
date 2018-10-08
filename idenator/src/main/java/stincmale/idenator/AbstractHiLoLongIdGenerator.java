@@ -15,44 +15,74 @@
  */
 package stincmale.idenator;
 
+import stincmale.idenator.doc.ThreadSafe;
 import static stincmale.idenator.internal.util.Preconditions.checkArgument;
+import static stincmale.idenator.internal.util.Preconditions.checkNotNull;
 
 /**
  * An abstract <a href="https://vladmihalcea.com/the-hilo-algorithm/">Hi/Lo</a> {@link LongIdGenerator}.
  */
 public abstract class AbstractHiLoLongIdGenerator implements LongIdGenerator {
+  /**
+   * This value is used to designate an uninitialized (similar to null for objects) <i>hi</i> value.
+   */
+  public static final long UNINITIALIZED = Long.MIN_VALUE;
+
+  private final HiValueGenerator hiValueGenerator;
   private final long loUpperBoundOpen;
 
   /**
+   * @param hiValueGenerator A <i>hi</i> value generator.
+   * It must be {@link ThreadSafe} is this implementation of {@link AbstractHiLoLongIdGenerator} is {@link ThreadSafe}.
+   * If {@code hiValueGenerator} is persistent, then the constructed {@link AbstractHiLoLongIdGenerator} is persistent.
    * @param loUpperBoundOpen This parameter specifies how many identifiers we can {@linkplain #generate() generate}
    * after obtaining a new <i>hi</i> value without retrieving the next <i>hi</i> value again.
    * <p>
-   * Generally speaking, {@code loUpperBoundOpen} can be safely increased for the same source of <i>hi</i> values,
-   * but decreasing it requires caution and in case of using a database sequence requires advancing the sequence value far enough
-   * to maintain the guarantee of identifier uniqueness.
+   * Generally speaking, {@code loUpperBoundOpen} can be safely increased for the same source of <i>hi</i> values.
+   * But decreasing it requires caution and in case of using a database sequence for generating <i>hi</i> values (a persistent generator)
+   * requires advancing the sequence value far enough to maintain the guarantee of identifier uniqueness.
    */
-  protected AbstractHiLoLongIdGenerator(final long loUpperBoundOpen) {
+  public AbstractHiLoLongIdGenerator(final HiValueGenerator hiValueGenerator, final long loUpperBoundOpen) {
     checkArgument(loUpperBoundOpen > 0, "loUpperBoundOpen", "Must be positive");
+    this.hiValueGenerator = checkNotNull(hiValueGenerator, "hiValueGenerator");
     this.loUpperBoundOpen = loUpperBoundOpen;
   }
 
   /**
-   * Calculates a new identifier.
+   * Calculates an identifier.
    *
    * @param hi A <i>hi</i> value, which in practical cases may represent a value from a database sequence.
-   * @param lo A <i>lo</i> value which is a looped in-memory counter,
-   * <i>lo</i> ∈ [0; {@linkplain #AbstractHiLoLongIdGenerator(long) loUpperBoundOpen}).
+   * @param lo A <i>lo</i> value which is a looped in-memory counter.
+   * <i>lo</i> ∈ [0; {@code loUpperBoundOpen}).
+   * @param loUpperBoundOpen See {@link #AbstractHiLoLongIdGenerator(HiValueGenerator, long)}.
    * @return The identifier corresponding to the supplied {@code hi} and {@code lo},
-   * which uniquely define the identifier for a given {@linkplain #AbstractHiLoLongIdGenerator(long) loUpperBoundOpen}.
+   * which uniquely define the identifier for a given {@code loUpperBoundOpen}.
    */
-  protected final long calculateId(final long hi, final long lo) {
+  protected static final long calculateId(final long hi, final long lo, final long loUpperBoundOpen) {
     return hi * loUpperBoundOpen + lo;
+  }
+
+  /**
+   * @return {@link HiValueGenerator#nextHi()} by using the {@link HiValueGenerator} supplied to the constructor.
+   */
+  protected final long nextHi() {
+    return hiValueGenerator.nextHi();
+  }
+
+  /**
+   * This method can be called without additional memory synchronization.
+   *
+   * @return {@code loUpperBoundOpen} supplied to the constructor.
+   */
+  protected final long getLoUpperBoundOpen() {
+    return loUpperBoundOpen;
   }
 
   @Override
   public String toString() {
     return getClass().getSimpleName() +
-      "{loUpperBoundOpen=" + loUpperBoundOpen +
+      "{hiValueGenerator=" + hiValueGenerator +
+      ", loUpperBoundOpen=" + loUpperBoundOpen +
       '}';
   }
 }

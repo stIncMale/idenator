@@ -27,7 +27,6 @@ import java.util.Collections;
 /**
  * An object of a type annotated with this annotation is immutable, the type is also called immutable.
  * Immutable objects are inherently {@linkplain ThreadSafe thread-safe}.
- * <p>
  * <ul>
  * <li>When this annotation is applied to an interface it means that implementations of the interface must be immutable.
  * If an implementation of the interface is not immutable, this must be explicitly stated
@@ -38,7 +37,6 @@ import java.util.Collections;
  * If a subclass is not immutable, this must be explicitly stated (e.g. by annotating it with {@link NotThreadSafe @NotThreadSafe}).</li>
  * <li>The class is immutable, but it does not impose this restriction on its subclasses.</li></ul></li>
  * </ul>
- * <p>
  * Immutability of an object means that its state cannot be seen to change by a user<sup>(1)</sup>.
  * Of necessity (but not sufficient) this means that
  * <ul>
@@ -46,7 +44,6 @@ import java.util.Collections;
  * <li>all public final reference fields refer to immutable objects;</li>
  * <li>methods do not publish references to any internal state which is mutable.</li>
  * </ul>
- * <p>
  * Immutable objects may still have internal mutable state (e.g. for purposes of performance optimization);
  * some state variables may be lazily computed,
  * so long as they are computed from immutable state and that users cannot tell the difference<sup>(2)</sup>

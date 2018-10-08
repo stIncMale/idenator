@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project
-    xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance"
+  xmlns = "http://maven.apache.org/POM/4.0.0"
+  xsi:schemaLocation = "http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <description>
     Specifies build settings (plugins, profiles, etc.).
   </description>
@@ -23,9 +23,9 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
           <configuration>
-            <source>9</source>
-            <target>9</target>
-            <release>9</release>
+            <source>11</source>
+            <target>11</target>
+            <release>11</release>
             <encoding>${idenator.charset}</encoding>
             <debug>true</debug>
             <debuglevel>lines,vars,source</debuglevel>
@@ -33,9 +33,6 @@
             <showDeprecation>true</showDeprecation>
             <compilerArgs>
               <arg>-Werror</arg>
-              <!-- TODO Option -Xlint:exports is disabled because of http://bugs.java.com/bugdatabase/view_bug.do?bug_id=JDK-8191112 -->
-              <!--<arg>-Xlint:all,-exports,-try,-processing,-requires-automatic,-requires-transitive-automatic</arg>-->
-              <!--<arg>-Xlint:all,-exports,-processing</arg>-->
               <arg>-Xlint:all,-processing</arg>
             </compilerArgs>
           </configuration>
@@ -59,21 +56,25 @@
           <artifactId>maven-surefire-plugin</artifactId>
           <configuration>
             <trimStackTrace>false</trimStackTrace>
-            <parallel>${idenator.maven-surefire-plugin.parallel}</parallel>
             <useUnlimitedThreads>false</useUnlimitedThreads>
-            <threadCount>${idenator.maven-surefire-plugin.threadCount}</threadCount>
-            <properties>
-              <includeTags>${idenator.maven-surefire-plugin.includeTags}</includeTags>
-              <excludeTags>${idenator.maven-surefire-plugin.excludeTags}</excludeTags>
-              <argLine>-enableassertions</argLine>
-            </properties>
+            <enableAssertions>true</enableAssertions>
+            <argLine><!--TODO something like this should be done by the plugin implicitly-->
+              --add-opens stincmale.idenator/stincmale.idenator=ALL-UNNAMED
+              --add-opens stincmale.idenator/stincmale.idenator.auxiliary=ALL-UNNAMED
+            </argLine>
           </configuration>
+          <dependencies><!--TODO with the next version of the plugin this should be unnecessary-->
+            <dependency>
+              <groupId>org.ow2.asm</groupId>
+              <artifactId>asm</artifactId>
+              <version>6.2.1</version>
+            </dependency>
+          </dependencies>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
           <configuration>
-            <detectJavaApiLink>false</detectJavaApiLink>
             <doctitle>idenator ${project.version} Java API Documentation</doctitle>
             <author>false</author>
             <show>protected</show>
@@ -102,15 +103,16 @@
               </group>
             </groups>
             <excludePackageNames>stincmale.idenator.internal:stincmale.idenator.internal.*</excludePackageNames>
-            <links>
-              <link>https://docs.oracle.com/javase/10/docs/api</link>
-              <link>https://javaee.github.io/javaee-spec/javadocs</link>
-            </links>
+            <detectJavaApiLink>false</detectJavaApiLink>
+            <detectLinks>false</detectLinks>
             <validateLinks>true</validateLinks>
+            <links>
+              <link>https://docs.oracle.com/en/java/javase/11/docs/api</link>
+            </links>
             <includeDependencySources>false</includeDependencySources>
             <includeTransitiveDependencySources>false</includeTransitiveDependencySources>
             <serialwarn>true</serialwarn>
-            <additionalparam>-Xdoclint:all -Xdoclint:-missing</additionalparam>
+            <additionalparam>-Xdoclint:all</additionalparam>
           </configuration>
           <executions>
             <execution>
@@ -154,42 +156,6 @@
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
-    </profile>
-    <profile>
-      <id>unitTest</id>
-      <properties>
-        <maven.test.skip>false</maven.test.skip>
-        <idenator.maven-surefire-plugin.parallel>classes</idenator.maven-surefire-plugin.parallel>
-        <idenator.maven-surefire-plugin.threadCount>5</idenator.maven-surefire-plugin.threadCount>
-        <idenator.maven-surefire-plugin.includeTags/>
-        <idenator.maven-surefire-plugin.excludeTags>performance, concurrency</idenator.maven-surefire-plugin.excludeTags>
-      </properties>
-    </profile>
-    <profile>
-      <id>performanceTest</id>
-      <properties>
-        <maven.test.skip>false</maven.test.skip>
-        <idenator.maven-surefire-plugin.parallel/>
-        <idenator.maven-surefire-plugin.threadCount>1</idenator.maven-surefire-plugin.threadCount>
-        <idenator.maven-surefire-plugin.includeTags>performance</idenator.maven-surefire-plugin.includeTags>
-        <idenator.maven-surefire-plugin.excludeTags>concurrency</idenator.maven-surefire-plugin.excludeTags>
-      </properties>
-    </profile>
-    <profile>
-      <id>concurrencyTest</id>
-      <properties>
-        <maven.test.skip>false</maven.test.skip>
-        <idenator.maven-surefire-plugin.parallel/>
-        <idenator.maven-surefire-plugin.threadCount>1</idenator.maven-surefire-plugin.threadCount>
-        <idenator.maven-surefire-plugin.includeTags>concurrency</idenator.maven-surefire-plugin.includeTags>
-        <idenator.maven-surefire-plugin.excludeTags>performance</idenator.maven-surefire-plugin.excludeTags>
-      </properties>
-    </profile>
-    <profile>
-      <id>doc</id>
-      <properties>
-        <maven.test.skip>true</maven.test.skip>
-      </properties>
       <build>
         <plugins>
           <plugin>
@@ -199,6 +165,11 @@
         </plugins>
       </build>
     </profile>
+    <profile>
+      <id>withTests</id>
+      <properties>
+        <maven.test.skip>false</maven.test.skip>
+      </properties>
+    </profile>
   </profiles>
 </project>
-

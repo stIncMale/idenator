@@ -14,16 +14,13 @@
  * limitations under the License.
  */
 
-package stincmale.idenator.internal.util;
+package stincmale.idenator;
 
-import java.util.Locale;
+import stincmale.idenator.auxiliary.NoopSleeper;
 
-public final class Utils {
-  private Utils() {
-    throw new UnsupportedOperationException("The class isn't designed to be instantiated");
-  }
-
-  public static final String format(final String format, final Object... args) {
-    return String.format(Locale.ROOT, format, args);
+final class SynchronizedHiLoLongIdGeneratorConcurrencyTest extends AbstractLongIdGeneratorConcurrencyTest {
+  private SynchronizedHiLoLongIdGeneratorConcurrencyTest() {
+    super(() -> new SynchronizedHiLoLongIdGenerator(new InMemoryHiValueGenerator(0, NoopSleeper.instance()), 10),
+      2 * Math.max(2, Runtime.getRuntime().availableProcessors()));
   }
 }

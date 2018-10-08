@@ -13,17 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package stincmale.idenator.auxiliary;
 
-package stincmale.idenator.internal.util;
+import stincmale.idenator.doc.ThreadSafe;
 
-import java.util.Locale;
+/**
+ * An implementation of {@link Sleeper} which never puts a thread into {@link Thread.State#TIMED_WAITING} state.
+ */
+@ThreadSafe
+public final class NoopSleeper implements Sleeper {
+  private static final NoopSleeper instance = new NoopSleeper();
 
-public final class Utils {
-  private Utils() {
-    throw new UnsupportedOperationException("The class isn't designed to be instantiated");
+  private NoopSleeper() {
   }
 
-  public static final String format(final String format, final Object... args) {
-    return String.format(Locale.ROOT, format, args);
+  /**
+   * Always returns the same instance.
+   *
+   * @return An instance of {@link NoopSleeper}.
+   */
+  public static final NoopSleeper instance() {
+    return instance;
+  }
+
+  /**
+   * Does nothing.
+   */
+  @Override
+  public final void sleep() {
   }
 }

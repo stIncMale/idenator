@@ -16,25 +16,21 @@
 
 package stincmale.idenator.performance.util;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.SortedSet;
-import java.util.TreeSet;
-import org.openjdk.jmh.runner.options.OptionsBuilder;
-import stincmale.idenator.doc.NotThreadSafe;
 import static java.lang.Boolean.parseBoolean;
+import org.openjdk.jmh.runner.options.OptionsBuilder;
 import static org.openjdk.jmh.runner.options.TimeValue.milliseconds;
+import stincmale.idenator.doc.NotThreadSafe;
 
 @NotThreadSafe
 public final class JmhOptions {
-  private static final boolean DRY_RUN = parseBoolean(System.getProperty("stincmale.idenator.performance.dryRun", "false"));
+  private static final boolean DRY_RUN = parseBoolean(System.getProperty("stincmale.idenator.performance.dryRun", "true"));
   private static final boolean JAVA_SERVER = true;
+  private static final boolean JAVA_BIASED_LOCKING = true;
   private static final boolean JAVA_ASSERTIONS = DRY_RUN;
-  public static final SortedSet<Integer> numbersOfThreads = DRY_RUN
-      ? new TreeSet<>(Collections.singleton(4))
-      : new TreeSet<>(Arrays.asList(4, 32));
+
+  private JmhOptions() {
+    throw new UnsupportedOperationException();
+  }
 
   public static final OptionsBuilder includingClass(final Class<?> klass) {
     final OptionsBuilder result = get();
@@ -44,41 +40,29 @@ public final class JmhOptions {
 
   public static final OptionsBuilder get() {
     final OptionsBuilder result = new OptionsBuilder();
-    result.jvmArgs("-Xms512m", "-Xmx512m")
+    result.jvmArgs("-Xms1024m", "-Xmx1024m", "-XX:+UseBiasedLocking")
       .jvmArgsAppend(
         JAVA_SERVER ? "-server" : "-client",
-        JAVA_ASSERTIONS ? "-enableassertions" : "-disableassertions")
-        .shouldDoGC(false)
-        .syncIterations(true)
-        .shouldFailOnError(true)
-        .threads(1)
-        .timeout(milliseconds(5_000));
+        JAVA_ASSERTIONS ? "-enableassertions" : "-disableassertions",
+        JAVA_BIASED_LOCKING ? "-XX:+UseBiasedLocking" : "-XX:-UseBiasedLocking")
+      .shouldDoGC(false)
+      .syncIterations(true)
+      .shouldFailOnError(true)
+      .threads(1)
+      .timeout(milliseconds(60_000));
     if (DRY_RUN) {
       result.forks(1)
-          .warmupTime(milliseconds(50))
-          .warmupIterations(1)
-          .measurementTime(milliseconds(50))
-          .measurementIterations(1);
+        .warmupTime(milliseconds(50))
+        .warmupIterations(1)
+        .measurementTime(milliseconds(50))
+        .measurementIterations(1);
     } else {
       result.forks(4)
-          .warmupTime(milliseconds(200))
-          .warmupIterations(10)
-          .measurementTime(milliseconds(200))
-          .measurementIterations(20);
+        .warmupTime(milliseconds(1000))
+        .warmupIterations(10)
+        .measurementTime(milliseconds(2000))
+        .measurementIterations(10);
     }
     return result;
-  }
-
-  public static final OptionsBuilder jvmArgsAppend(final OptionsBuilder ob, final String... append) {
-    final Collection<String> jvmArgsAppend = ob.getJvmArgsAppend()
-        .orElse(Collections.emptyList());
-    final Collection<String> newJvmArgsAppend = new ArrayList<>(jvmArgsAppend);
-    newJvmArgsAppend.addAll(Arrays.asList(append));
-    ob.jvmArgsAppend(newJvmArgsAppend.toArray(new String[newJvmArgsAppend.size()]));
-    return ob;
-  }
-
-  private JmhOptions() {
-    throw new UnsupportedOperationException();
   }
 }

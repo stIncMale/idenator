@@ -14,15 +14,13 @@
  * limitations under the License.
  */
 
-package stincmale.idenator;
+package stincmale.idenator.util;
 
-import java.time.Duration;
-import stincmale.idenator.fake.ConcurrentInMemoryHiLoLongIdGenerator;
+public final class TestTag {
+  public static final String UNIT = "unit";
+  public static final String CONCURRENCY = "concurrency";
 
-public final class ConcurrentAbstractHiLoLongIdGeneratorConcurrencyTest extends AbstractLongIdGeneratorConcurrencyTest {
-  public ConcurrentAbstractHiLoLongIdGeneratorConcurrencyTest() {
-    super(() -> new ConcurrentInMemoryHiLoLongIdGenerator(0, 10, Duration.ofMillis(1)),
-        2 * Math.max(2, Runtime.getRuntime()
-          .availableProcessors()));
+  private TestTag() {
+    throw new UnsupportedOperationException("The class isn't designed to be instantiated");
   }
 }

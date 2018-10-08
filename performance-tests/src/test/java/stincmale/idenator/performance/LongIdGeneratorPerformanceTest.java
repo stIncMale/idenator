@@ -16,12 +16,7 @@
 
 package stincmale.idenator.performance;
 
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Set;
-import java.util.TreeSet;
+import static java.time.Duration.ofMillis;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 import org.junit.jupiter.api.Tag;
@@ -36,129 +31,139 @@ import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
-import stincmale.idenator.LongIdGenerator;
+import stincmale.idenator.ConcurrentHiLoLongIdGenerator;
+import stincmale.idenator.InMemoryHiValueGenerator;
+import stincmale.idenator.SynchronizedHiLoLongIdGenerator;
+import stincmale.idenator.auxiliary.GaussianSleeper;
+import stincmale.idenator.auxiliary.NoopSleeper;
 import stincmale.idenator.performance.util.JmhOptions;
-import stincmale.idenator.performance.util.PerformanceTestTag;
-import static stincmale.idenator.performance.util.JmhOptions.jvmArgsAppend;
-import static stincmale.idenator.performance.util.Utils.format;
+import stincmale.idenator.performance.util.TestTag;
 
-@Tag(PerformanceTestTag.VALUE)
+@Tag(TestTag.PERFORMANCE)
 @TestInstance(Lifecycle.PER_CLASS)
 public class LongIdGeneratorPerformanceTest {
-  private static final long ACCEPTABLE_INCORRECTLY_REGISTERED_TICKS_EVENTS_COUNT_PER_TRIAL = 0;
-  private static final String SYSTEM_PROPERTY_GROUP_OF_RUNS_DESCRIPTOR = "stincmale.idenator.performance.groupOfRunsDescriptor";
-  private static final long LO_UPPER_BOUND_OPEN = 1000;
-  private static final Duration maxNextHiDelay = Duration.of(10, ChronoUnit.MILLIS);
-
-  private enum GroupOfRunsDescriptor {
-    A_SYNCHRONIZED_IN_MEMORY_HILO_LONG_ID_GENERATOR(
-        format("%s, max next hi delay: %sms", SynchronizedInMemoryHiLoLongIdGenerator.class.getSimpleName(), maxNextHiDelay.toMillis()),
-        JmhOptions.numbersOfThreads,
-        () -> new SynchronizedInMemoryHiLoLongIdGenerator(0, LO_UPPER_BOUND_OPEN, maxNextHiDelay)),
-    B_CONCURRENT_IN_MEMORY_HILO_LONG_ID_GENERATOR(
-        format("%s, max next hi delay: %sms", SynchronizedInMemoryHiLoLongIdGenerator.class.getSimpleName(), maxNextHiDelay.toMillis()),
-        JmhOptions.numbersOfThreads,
-        () -> new SynchronizedInMemoryHiLoLongIdGenerator(0, LO_UPPER_BOUND_OPEN, maxNextHiDelay));
-
-    private final String description;
-    private final Set<Integer> numbersOfThreads;
-    private final Supplier<LongIdGenerator> longIdGeneratorCreator;
-
-    GroupOfRunsDescriptor(
-        final String name,
-        final Collection<Integer> numbersOfThreads,
-        final Supplier<LongIdGenerator> longIdGeneratorCreator) {
-      this.description = name;
-      this.numbersOfThreads = Collections.unmodifiableSet(new TreeSet<>(numbersOfThreads));
-      this.longIdGeneratorCreator = longIdGeneratorCreator;
-    }
-  }
-
   public LongIdGeneratorPerformanceTest() {
   }
 
-  @Test
-  public final void synchronizedInMemoryHiLoLongIdGeneratorThroughput() {
-    runThroughput(GroupOfRunsDescriptor.A_SYNCHRONIZED_IN_MEMORY_HILO_LONG_ID_GENERATOR);
+  private static final void runThroughputBenchmarks(final int numberOfThreads) throws RunnerException {
+    new Runner(JmhOptions.includingClass(LongIdGeneratorPerformanceTest.class)
+      .mode(Mode.Throughput)
+      .timeUnit(TimeUnit.MICROSECONDS)
+      .threads(numberOfThreads)
+      .build())
+      .run();
+  }
+
+  private static final void runLatencyBenchmarks(final int numberOfThreads) throws RunnerException {
+    if (numberOfThreads <= Runtime.getRuntime().availableProcessors()) {//no sense in measuring latency of a system oversaturated with threads
+      new Runner(JmhOptions.includingClass(LongIdGeneratorPerformanceTest.class)
+        .mode(Mode.AverageTime)
+        .timeUnit(TimeUnit.MICROSECONDS)
+        .threads(numberOfThreads)
+        .build())
+        .run();
+    }
   }
 
   @Test
-  public final void synchronizedInMemoryHiLoLongIdGeneratorLatency() {
-    runLatency(GroupOfRunsDescriptor.A_SYNCHRONIZED_IN_MEMORY_HILO_LONG_ID_GENERATOR);
+  public final void throughputThreads1() throws RunnerException {
+    runThroughputBenchmarks(1);
   }
 
   @Test
-  public final void concurrentInMemoryHiLoLongIdGeneratorThroughput() {
-    runThroughput(GroupOfRunsDescriptor.B_CONCURRENT_IN_MEMORY_HILO_LONG_ID_GENERATOR);
+  public final void latencyThreads1() throws RunnerException {
+    runLatencyBenchmarks(1);
   }
 
   @Test
-  public final void concurrentInMemoryHiLoLongIdGeneratorLatency() {
-    runLatency(GroupOfRunsDescriptor.B_CONCURRENT_IN_MEMORY_HILO_LONG_ID_GENERATOR);
+  public final void throughputThreads4() throws RunnerException {
+    runThroughputBenchmarks(4);
+  }
+
+  @Test
+  public final void latencyThreads4() throws RunnerException {
+    runLatencyBenchmarks(4);
+  }
+
+  @Test
+  public final void throughputThreads32() throws RunnerException {
+    runThroughputBenchmarks(32);
+  }
+
+  @Test
+  public final void latencyThreads32() throws RunnerException {
+    runLatencyBenchmarks(32);
   }
 
   @Benchmark
-  public long generate(final BenchmarkState benchmarkState) {
-    return benchmarkState.longIdGenerator.generate();
+  public final long concurrentNoSleepBigLo(final BenchmarkState state) {
+    return state.concurrentNoSleepBigLo.generate();
+  }
+
+  @Benchmark
+  public final long concurrentNoSleepSmallLo(final BenchmarkState state) {
+    return state.concurrentNoSleepSmallLo.generate();
+  }
+
+  @Benchmark
+  public final long concurrentSleepBigLo(final BenchmarkState state) {
+    return state.concurrentSleepBigLo.generate();
+  }
+
+  @Benchmark
+  public final long concurrentSleepSmallLo(final BenchmarkState state) {
+    return state.concurrentSleepSmallLo.generate();
+  }
+
+  @Benchmark
+  public final long synchronizedNoSleepBigLo(final BenchmarkState state) {
+    return state.synchronizedNoSleepBigLo.generate();
+  }
+
+  @Benchmark
+  public final long synchronizedNoSleepSmallLo(final BenchmarkState state) {
+    return state.synchronizedNoSleepSmallLo.generate();
+  }
+
+  @Benchmark
+  public final long synchronizedSleepBigLo(final BenchmarkState state) {
+    return state.synchronizedSleepBigLo.generate();
+  }
+
+  @Benchmark
+  public final long synchronizedSleepSmallLo(final BenchmarkState state) {
+    return state.synchronizedSleepSmallLo.generate();
   }
 
   @State(Scope.Benchmark)
   public static class BenchmarkState {
-    private LongIdGenerator longIdGenerator;
+    private ConcurrentHiLoLongIdGenerator concurrentNoSleepBigLo;
+    private ConcurrentHiLoLongIdGenerator concurrentNoSleepSmallLo;
+    private ConcurrentHiLoLongIdGenerator concurrentSleepBigLo;
+    private ConcurrentHiLoLongIdGenerator concurrentSleepSmallLo;
+    private SynchronizedHiLoLongIdGenerator synchronizedNoSleepBigLo;
+    private SynchronizedHiLoLongIdGenerator synchronizedNoSleepSmallLo;
+    private SynchronizedHiLoLongIdGenerator synchronizedSleepBigLo;
+    private SynchronizedHiLoLongIdGenerator synchronizedSleepSmallLo;
 
     public BenchmarkState() {
     }
 
     @Setup(Level.Trial)
     public final void setup() {
-      final GroupOfRunsDescriptor groupOfRunsDescriptor = GroupOfRunsDescriptor.valueOf(System.getProperty(SYSTEM_PROPERTY_GROUP_OF_RUNS_DESCRIPTOR));
-      longIdGenerator = groupOfRunsDescriptor.longIdGeneratorCreator.get();
-    }
-  }
-
-  private final void runThroughput(final GroupOfRunsDescriptor groupOfRunsDescriptor) {
-    final int numberOfAvailableProcessors = Runtime.getRuntime().availableProcessors();
-    for (int numberOfThreads : groupOfRunsDescriptor.numbersOfThreads) {
-      runThroughput(groupOfRunsDescriptor, numberOfThreads);
-    }
-  }
-
-  private final void runLatency(final GroupOfRunsDescriptor groupOfRunsDescriptor) {
-    final int numberOfAvailableProcessors = Runtime.getRuntime().availableProcessors();
-    for (int numberOfThreads : groupOfRunsDescriptor.numbersOfThreads) {
-      if (numberOfThreads <= numberOfAvailableProcessors) {//there is no sense in measuring latency of a system oversaturated with threads
-        runLatency(groupOfRunsDescriptor, numberOfThreads);
-      }
-    }
-  }
-
-  private final void runThroughput(final GroupOfRunsDescriptor groupOfRunsDescriptor, final int numberOfThreads) {
-    try {
-      new Runner(jvmArgsAppend(
-          JmhOptions.includingClass(LongIdGeneratorPerformanceTest.class),
-          format("-D%s=%s", SYSTEM_PROPERTY_GROUP_OF_RUNS_DESCRIPTOR, groupOfRunsDescriptor.name()))
-          .mode(Mode.Throughput)
-          .timeUnit(TimeUnit.MILLISECONDS)
-          .threads(numberOfThreads)
-          .build())
-          .run();
-    } catch (final RunnerException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  private final void runLatency(final GroupOfRunsDescriptor groupOfRunsDescriptor, final int numberOfThreads) {
-    try {
-      new Runner(jvmArgsAppend(
-          JmhOptions.includingClass(LongIdGeneratorPerformanceTest.class),
-          format("-D%s=%s", SYSTEM_PROPERTY_GROUP_OF_RUNS_DESCRIPTOR, groupOfRunsDescriptor.name()))
-          .mode(Mode.AverageTime)
-          .timeUnit(TimeUnit.MICROSECONDS)
-          .threads(numberOfThreads)
-          .build())
-          .run();
-    } catch (final RunnerException e) {
-      throw new RuntimeException(e);
+      final Supplier<InMemoryHiValueGenerator> hiValueGenNoSleepCreator = () -> new InMemoryHiValueGenerator(0, NoopSleeper.instance());
+      final Supplier<InMemoryHiValueGenerator> hiValueGenSleepCreator = () -> new InMemoryHiValueGenerator(
+        0, new GaussianSleeper(ofMillis(10), ofMillis(2)));
+      final long smallLo = 10_000;
+      final long bigLo = 1000_000;
+      concurrentNoSleepBigLo = new ConcurrentHiLoLongIdGenerator(hiValueGenNoSleepCreator.get(), bigLo);
+      concurrentNoSleepSmallLo = new ConcurrentHiLoLongIdGenerator(hiValueGenNoSleepCreator.get(), smallLo);
+      concurrentSleepBigLo = new ConcurrentHiLoLongIdGenerator(hiValueGenSleepCreator.get(), bigLo);
+      concurrentSleepSmallLo = new ConcurrentHiLoLongIdGenerator(hiValueGenSleepCreator.get(), smallLo);
+      synchronizedNoSleepBigLo = new SynchronizedHiLoLongIdGenerator(hiValueGenNoSleepCreator.get(), bigLo);
+      synchronizedNoSleepSmallLo = new SynchronizedHiLoLongIdGenerator(hiValueGenNoSleepCreator.get(), smallLo);
+      synchronizedSleepBigLo = new SynchronizedHiLoLongIdGenerator(hiValueGenSleepCreator.get(), bigLo);
+      synchronizedSleepSmallLo = new SynchronizedHiLoLongIdGenerator(hiValueGenSleepCreator.get(), smallLo);
     }
   }
 }

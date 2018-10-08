@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package stincmale.idenator.util;
+package stincmale.idenator;
 
-public final class ConcurrencyTestTag {
-  public static final String VALUE = "concurrency";
+import stincmale.idenator.auxiliary.NoopSleeper;
 
-  private ConcurrencyTestTag() {
-    throw new UnsupportedOperationException("The class isn't designed to be instantiated");
+final class ConcurrentHiLoLongIdGeneratorConcurrencyTest extends AbstractLongIdGeneratorConcurrencyTest {
+  private ConcurrentHiLoLongIdGeneratorConcurrencyTest() {
+    super(() -> new ConcurrentHiLoLongIdGenerator(new InMemoryHiValueGenerator(0, NoopSleeper.instance()), 10),
+      2 * Math.max(2, Runtime.getRuntime().availableProcessors()));
   }
 }

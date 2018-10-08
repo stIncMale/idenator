@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package stincmale.idenator;
+package stincmale.idenator.auxiliary;
 
-import java.util.function.Supplier;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -25,22 +24,25 @@ import stincmale.idenator.util.TestTag;
 
 @Tag(TestTag.UNIT)
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
-abstract class AbstractLongIdGeneratorUnitTest extends AbstractLongIdGeneratorTest {
-  @SafeVarargs
-  protected AbstractLongIdGeneratorUnitTest(final Supplier<LongIdGenerator>... longIdGeneratorCreators) {
-    super(longIdGeneratorCreators);
+final class GaussianRandomTest {
+  private GaussianRandomTest() {
+  }
+
+  private static final void assertBounds(final GaussianRandom rnd) {
+    final double min = rnd.getMidrange() - rnd.getAbsoluteDeviation();
+    final double max = rnd.getMidrange() + rnd.getAbsoluteDeviation();
+    for (int i = 0; i < 1000_000; i++) {
+      final double value = rnd.next();
+      assertTrue(value >= min);
+      assertTrue(value <= max);
+    }
   }
 
   @Test
-  final void generate() {
-    getLongIdGeneratorCreators().forEach(idGenCreator -> {
-      final LongIdGenerator idGen = idGenCreator.get();
-      assertEquals(0, idGen.generate(), idGen.toString());
-      final int iterations = 15;
-      for (int i = 0; i < iterations; i++) {
-        idGen.generate();
-      }
-      assertEquals(iterations + 1, idGen.generate(), idGen.toString());
-    });
+  final void next() {
+    assertBounds(new GaussianRandom(1, 0));
+    assertBounds(new GaussianRandom(1, 1));
+    assertBounds(new GaussianRandom(1234, 111));
+    assertBounds(new GaussianRandom(Double.MAX_VALUE / 2d, Double.MAX_VALUE / 2d));
   }
 }

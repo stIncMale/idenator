@@ -18,43 +18,39 @@ package stincmale.idenator;
 import java.util.concurrent.atomic.AtomicLong;
 import stincmale.idenator.doc.ThreadSafe;
 import static stincmale.idenator.internal.util.Constants.EXCLUDE_ASSERTIONS_FROM_BYTECODE;
-import static stincmale.idenator.internal.util.Preconditions.checkArgument;
 
-
+/**
+ * A concurrent implementation of {@link AbstractHiLoLongIdGenerator}.
+ */
 @ThreadSafe
-public abstract class ConcurrentAbstractHiLoLongIdGenerator implements LongIdGenerator {
-  /**
-   * This value is used internally to designate an uninitialized <i>hi</i> value.
-   */
-  protected static final long UNINITIALIZED = Long.MIN_VALUE;
+public final class ConcurrentHiLoLongIdGenerator extends AbstractHiLoLongIdGenerator {
   private static final int MAX_ATTEMPTS_BEFORE_LOCKING = 5;
-
-  private volatile long hi;
   private final AtomicLong lo;
-  private final long loUpperBoundOpen;//VAKOTODO move to a different class; this calue can be safely increased, but can't be easily reduced
   private final Object mutex;
+  private volatile long hi;
 
   /**
+   * @param hiValueGenerator See {@link AbstractHiLoLongIdGenerator#AbstractHiLoLongIdGenerator(HiValueGenerator, long)}.
    * @param loUpperBoundOpen This parameter specifies how many identifiers we can {@linkplain #generate() generate}
    * after calling {@link #nextHi()} without calling {@link #nextHi()} again.
    * <i>lo</i> ∈ [0; {@code loUpperBoundOpen}).
    */
-  protected ConcurrentAbstractHiLoLongIdGenerator(final long loUpperBoundOpen) {
-    checkArgument(loUpperBoundOpen > 0, "loUpperBoundOpen", "Must be positive");
+  public ConcurrentHiLoLongIdGenerator(final HiValueGenerator hiValueGenerator, final long loUpperBoundOpen) {
+    super(hiValueGenerator, loUpperBoundOpen);
     hi = UNINITIALIZED;
     lo = new AtomicLong(-1);
-    this.loUpperBoundOpen = loUpperBoundOpen;
     mutex = new Object();
   }
 
   @Override
   public final long generate() {
+    final long loUpperBoundOpen = getLoUpperBoundOpen();
     long hi = UNINITIALIZED;
     long lo = UNINITIALIZED;
     for (int attemptIdx = 0; attemptIdx <= MAX_ATTEMPTS_BEFORE_LOCKING; attemptIdx++) {
       hi = initializedHi();
       lo = this.lo.incrementAndGet();
-      if (lo >= loUpperBoundOpen ||//lo is too big, we need to reset it and advance hi
+      if (lo >= loUpperBoundOpen ||//lo is too big, we need to reset lo and advance hi
         attemptIdx == MAX_ATTEMPTS_BEFORE_LOCKING) {//we were unlucky for too many attempts, it's time to use locking to avoid a live-lock
         synchronized (mutex) {
           lo = this.lo.incrementAndGet();
@@ -71,7 +67,7 @@ public abstract class ConcurrentAbstractHiLoLongIdGenerator implements LongIdGen
       } else {//lo is fine, check that hi is still the same
         long hi2 = initializedHi();
         if (hi2 == hi) {
-          break;//hi is the same, hence read hi+lo was atomic
+          break;//hi is the same, hence read hi+lo was atomic and we can break the loop
         }// else continue this while loop because hi was changed while we were reading lo, so we can't guarantee that the hi+lo read is atomic
       }
     }
@@ -79,10 +75,6 @@ public abstract class ConcurrentAbstractHiLoLongIdGenerator implements LongIdGen
     assert EXCLUDE_ASSERTIONS_FROM_BYTECODE || lo != UNINITIALIZED;
     assert EXCLUDE_ASSERTIONS_FROM_BYTECODE || lo < loUpperBoundOpen;
     return calculateId(hi, lo, loUpperBoundOpen);
-  }
-
-  protected final long getLoUpperBoundOpen() {
-    return loUpperBoundOpen;
   }
 
   /**
@@ -102,25 +94,5 @@ public abstract class ConcurrentAbstractHiLoLongIdGenerator implements LongIdGen
       }
     }
     return hi;
-  }
-
-  private static final long calculateId(final long hi, final long lo, final long loUpperBoundOpen) {
-    return hi * loUpperBoundOpen + lo;
-  }
-
-  /**
-   * Generates the next <i>hi</i> value and returns it.
-   * In practical cases the next value from a database sequence may be returned.
-   * <i>hi</i> must not be equal to {@link #UNINITIALIZED} because this value is reserved for internal purposes.
-   *
-   * @return The next <i>hi</i> value.
-   */
-  protected abstract long nextHi();
-
-  @Override
-  public String toString() {
-    return getClass().getSimpleName() +
-      "{loUpperBoundOpen=" + loUpperBoundOpen +
-      '}';
   }
 }

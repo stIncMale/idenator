@@ -25,7 +25,6 @@ import java.lang.annotation.Target;
 /**
  * An object of a type annotated with this annotation can be used<sup>(1)</sup> concurrently
  * without any additional synchronization or coordination on the part of a user. Such objects and types are called thread-safe.
- * <p>
  * <ul>
  * <li>When this annotation is applied to an interface it means that implementations of the interface must be thread-safe.
  * If an implementation of the interface is not thread-safe, this must be explicitly stated
@@ -36,7 +35,6 @@ import java.lang.annotation.Target;
  * If a subclass is not thread-safe, this must be explicitly stated (e.g. by annotating it with {@link NotThreadSafe @NotThreadSafe}).</li>
  * <li>The class is thread-safe, but it does not impose this restriction on its subclasses.</li></ul></li>
  * </ul>
- * <p>
  * No type can be considered thread-safe unless the type is explicitly documented as such (e.g. it is annotated with {@link ThreadSafe @ThreadSafe}),
  * or thread-safety of the class follows of necessity from some well-known truth.
  * <p>

@@ -22,38 +22,33 @@ import java.util.concurrent.Phaser;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import stincmale.idenator.util.TestTag;
 
+@Tag(TestTag.CONCURRENCY)
+@TestInstance(TestInstance.Lifecycle.PER_METHOD)
 abstract class AbstractLongIdGeneratorConcurrencyTest extends AbstractLongIdGeneratorTest {
   private final int numberOfThreads;
   private ExecutorService ex;
 
   protected AbstractLongIdGeneratorConcurrencyTest(
-      final Supplier<LongIdGenerator> longIdGeneratorCreator,
-      final int numberOfThreads) {
+    final Supplier<LongIdGenerator> longIdGeneratorCreator,
+    final int numberOfThreads) {
     super(longIdGeneratorCreator);
     this.numberOfThreads = numberOfThreads;
   }
 
-  @Test
-  public final void test() {
-    final int numberOfTestIterations = 50;
-    final int numberOfIdsPerThread = 1000;
-    for (int i = 1; i <= numberOfTestIterations; i++) {
-      final LongIdGenerator idGen = getLongIdGeneratorCreator().get();
-      doTest(idGen, numberOfThreads, numberOfIdsPerThread, ex);
-    }
-  }
-
   private static final void doTest(
-      final LongIdGenerator idGen,
-      final int numberOfThreads,
-      final int numberOfIdsPerThread,
-      final ExecutorService ex) {
+    final LongIdGenerator idGen,
+    final int numberOfThreads,
+    final int numberOfIdsPerThread,
+    final ExecutorService ex) {
     final ConcurrentSkipListMap<Long, Long> uniqueIds = new ConcurrentSkipListMap<>();
     final AtomicReference<Long> firstDuplicateId = new AtomicReference<>();
     final AtomicReference<RuntimeException> firstException = new AtomicReference<>();
@@ -64,12 +59,12 @@ abstract class AbstractLongIdGeneratorConcurrencyTest extends AbstractLongIdGene
           latch.arriveAndAwaitAdvance();
           final long[] ids = new long[numberOfIdsPerThread];
           for (int i = 0; i < numberOfIdsPerThread; i++) {
-            ids[i] = idGen.generate();//collect ids into a local array to avoid additional synchronization introduced by concurrent map
+            ids[i] = idGen.generate();//collect ids into a local array to avoid additional synchronization introduced by a concurrent map
           }
           for (long id : ids) {
             uniqueIds.merge(id, id, (existingId, newId) -> {
               firstDuplicateId.compareAndSet(null, existingId);
-              throw new AssertionError(existingId);
+              throw new AssertionError();
             });
           }
         } catch (final RuntimeException e) {
@@ -84,18 +79,29 @@ abstract class AbstractLongIdGeneratorConcurrencyTest extends AbstractLongIdGene
     if (firstException.get() != null) {
       throw new RuntimeException(firstException.get());
     }
-    assertNull(firstDuplicateId.get(), String.format("Generated id %s more than once", firstDuplicateId.get()));
-    assertEquals(numberOfThreads * numberOfIdsPerThread, uniqueIds.size());
-    assertTrue(numberOfThreads * numberOfIdsPerThread - 1 <= uniqueIds.lastKey());
+    assertNull(firstDuplicateId.get(), String.format("Generated id %s more than once from %s", firstDuplicateId.get(), idGen));
+    assertEquals(numberOfThreads * numberOfIdsPerThread, uniqueIds.size(), idGen.toString());
+    assertTrue(numberOfThreads * numberOfIdsPerThread - 1 <= uniqueIds.lastKey(), idGen.toString());
+  }
+
+  @Test
+  final void test() {
+    final int numberOfTestIterations = 10_000;
+    final int numberOfIdsPerThread = 3000;
+    getLongIdGeneratorCreators().forEach(idGenCreator -> {
+      for (int i = 1; i <= numberOfTestIterations; i++) {
+        doTest(idGenCreator.get(), numberOfThreads, numberOfIdsPerThread, ex);
+      }
+    });
   }
 
   @BeforeEach
-  public final void beforeEach() {
+  final void beforeEach() {
     ex = Executors.newFixedThreadPool(numberOfThreads);
   }
 
   @AfterEach
-  public final void afterEach() {
+  final void afterEach() {
     ex.shutdownNow();
   }
 }

@@ -16,11 +16,12 @@
 
 package stincmale.idenator;
 
-import java.time.Duration;
-import stincmale.idenator.fake.ConcurrentInMemoryHiLoLongIdGenerator;
+import stincmale.idenator.auxiliary.NoopSleeper;
 
-public final class ConcurrentAbstractHiLoLongIdGeneratorTest extends AbstractLongIdGeneratorUnitTest {
-  public ConcurrentAbstractHiLoLongIdGeneratorTest() {
-    super(() -> new ConcurrentInMemoryHiLoLongIdGenerator(0, 10, Duration.ofMillis(10)));
+final class ConcurrentHiLoLongIdGeneratorTest extends AbstractLongIdGeneratorUnitTest {
+  private ConcurrentHiLoLongIdGeneratorTest() {
+    super(
+      () -> new ConcurrentHiLoLongIdGenerator(new InMemoryHiValueGenerator(0, NoopSleeper.instance()), 1),
+      () -> new ConcurrentHiLoLongIdGenerator(new InMemoryHiValueGenerator(0, NoopSleeper.instance()), 10));
   }
 }

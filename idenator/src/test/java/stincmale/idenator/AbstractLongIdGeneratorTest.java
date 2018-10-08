@@ -16,17 +16,25 @@
 
 package stincmale.idenator;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.function.Supplier;
+import static stincmale.idenator.internal.util.Preconditions.checkArgument;
 import static stincmale.idenator.internal.util.Preconditions.checkNotNull;
 
 abstract class AbstractLongIdGeneratorTest {
-  private final Supplier<LongIdGenerator> idGenCreator;
+  private final Collection<Supplier<LongIdGenerator>> idGenCreators;
 
-  protected AbstractLongIdGeneratorTest(final Supplier<LongIdGenerator> longIdGeneratorCreator) {
-    this.idGenCreator = checkNotNull(longIdGeneratorCreator, "longIdGeneratorCreator");
+  @SafeVarargs
+  protected AbstractLongIdGeneratorTest(final Supplier<LongIdGenerator>... longIdGeneratorCreators) {
+    checkNotNull(longIdGeneratorCreators, "longIdGeneratorCreators");
+    checkArgument(longIdGeneratorCreators.length > 0, "longIdGeneratorCreators", "Must not be empty");
+    @SuppressWarnings("varargs")
+    final Collection<Supplier<LongIdGenerator>> idGenCreators = List.of(longIdGeneratorCreators);
+    this.idGenCreators = idGenCreators;
   }
 
-  protected final Supplier<LongIdGenerator> getLongIdGeneratorCreator() {
-    return idGenCreator;
+  protected final Collection<Supplier<LongIdGenerator>> getLongIdGeneratorCreators() {
+    return idGenCreators;
   }
 }

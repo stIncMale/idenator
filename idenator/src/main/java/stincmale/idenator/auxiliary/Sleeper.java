@@ -13,13 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package stincmale.idenator.auxiliary;
 
-package stincmale.idenator.performance.util;
+import stincmale.idenator.doc.NotThreadSafe;
 
-public final class PerformanceTestTag {
-  public static final String VALUE = "performance";
-
-  private PerformanceTestTag() {
-    throw new UnsupportedOperationException();
-  }
+/**
+ * An object allowing to put a thread calling {@link #sleep()} into {@link Thread.State#TIMED_WAITING} state
+ * for a duration decided be the implementation.
+ */
+@NotThreadSafe
+public interface Sleeper {
+  /**
+   * Puts a thread calling this method into {@link Thread.State#TIMED_WAITING} for a duration decided be the implementation.
+   */
+  void sleep();
 }

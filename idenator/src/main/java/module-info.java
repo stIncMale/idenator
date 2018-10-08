@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+/**
+ * Provides tools for generating identifiers.
+ */
 module stincmale.idenator {
   exports stincmale.idenator;
   exports stincmale.idenator.doc;

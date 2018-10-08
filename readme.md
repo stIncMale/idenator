@@ -1,8 +1,8 @@
 # idenator
 <p align="right">
-<a href="http://www.oracle.com/technetwork/java/javase/overview/index.html"><img src="https://img.shields.io/badge/Java-11+-blue.svg" alt="Java requirement"></a>
+<a href="https://docs.oracle.com/en/java/javase/11/"><img src="https://img.shields.io/badge/Java-11+-blue.svg" alt="Java requirement"></a>
 <a href="https://github.com/stIncMale/idenator/wiki"><img src="https://img.shields.io/badge/documentation-current-blue.svg" alt="Docs link"></a>
-<a href="https://stincmale.github.io/idenator/apidocs/current/index.html?overview-summary.html"><img src="https://img.shields.io/badge/javadocs-current-blue.svg" alt="API docs"></a>
+<a href="https://stincmale.github.io/idenator/apidocs/current/stincmale.idenator/module-summary.html"><img src="https://img.shields.io/badge/javadocs-current-blue.svg" alt="API docs"></a>
 </p>
 
 ## About

@@ -23,10 +23,9 @@ import stincmale.idenator.doc.NotThreadSafe;
 
 @NotThreadSafe
 public final class JmhOptions {
-  private static final boolean DRY_RUN = parseBoolean(System.getProperty("stincmale.idenator.performance.dryRun", "false"));
+  private static final boolean JAVA_BIASED_LOCKING = parseBoolean(System.getProperty("stincmale.idenator.performance.biasedLocking", "true"));
   private static final boolean JAVA_SERVER = true;
-  private static final boolean JAVA_BIASED_LOCKING = false;
-  private static final boolean JAVA_ASSERTIONS = DRY_RUN;
+  private static final boolean JAVA_ASSERTIONS = false;
 
   private JmhOptions() {
     throw new UnsupportedOperationException();
@@ -40,7 +39,7 @@ public final class JmhOptions {
 
   public static final OptionsBuilder get() {
     final OptionsBuilder result = new OptionsBuilder();
-    result.jvmArgs("-Xms1024m", "-Xmx1024m", "-XX:+UseBiasedLocking")
+    result.jvmArgs("-Xms1024m", "-Xmx1024m")
       .jvmArgsAppend(
         JAVA_SERVER ? "-server" : "-client",
         JAVA_ASSERTIONS ? "-enableassertions" : "-disableassertions",
@@ -50,19 +49,11 @@ public final class JmhOptions {
       .shouldFailOnError(true)
       .threads(1)
       .timeout(milliseconds(60_000));
-    if (DRY_RUN) {
-      result.forks(1)
-        .warmupTime(milliseconds(50))
-        .warmupIterations(1)
-        .measurementTime(milliseconds(50))
-        .measurementIterations(1);
-    } else {
-      result.forks(4)
-        .warmupTime(milliseconds(300))
-        .warmupIterations(7)
-        .measurementTime(milliseconds(500))
-        .measurementIterations(5);
-    }
+    result.forks(4)
+      .warmupTime(milliseconds(300))
+      .warmupIterations(7)
+      .measurementTime(milliseconds(500))
+      .measurementIterations(5);
     return result;
   }
 }

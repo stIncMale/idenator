@@ -58,7 +58,7 @@ public class LongIdGeneratorPerformanceTest {
     if (numberOfThreads <= Runtime.getRuntime().availableProcessors()) {//no sense in measuring latency of a system oversaturated with threads
       new Runner(JmhOptions.includingClass(LongIdGeneratorPerformanceTest.class)
         .mode(Mode.AverageTime)
-        .timeUnit(TimeUnit.MICROSECONDS)
+        .timeUnit(TimeUnit.NANOSECONDS)
         .threads(numberOfThreads)
         .build())
         .run();

@@ -23,9 +23,9 @@ import stincmale.idenator.doc.NotThreadSafe;
 
 @NotThreadSafe
 public final class JmhOptions {
-  private static final boolean DRY_RUN = parseBoolean(System.getProperty("stincmale.idenator.performance.dryRun", "true"));
+  private static final boolean DRY_RUN = parseBoolean(System.getProperty("stincmale.idenator.performance.dryRun", "false"));
   private static final boolean JAVA_SERVER = true;
-  private static final boolean JAVA_BIASED_LOCKING = true;
+  private static final boolean JAVA_BIASED_LOCKING = false;
   private static final boolean JAVA_ASSERTIONS = DRY_RUN;
 
   private JmhOptions() {
@@ -58,10 +58,10 @@ public final class JmhOptions {
         .measurementIterations(1);
     } else {
       result.forks(4)
-        .warmupTime(milliseconds(1000))
-        .warmupIterations(10)
-        .measurementTime(milliseconds(2000))
-        .measurementIterations(10);
+        .warmupTime(milliseconds(300))
+        .warmupIterations(7)
+        .measurementTime(milliseconds(500))
+        .measurementIterations(5);
     }
     return result;
   }

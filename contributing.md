@@ -5,7 +5,7 @@ This project uses [Maven](https://maven.apache.org/) for organizing, managing de
 Run from the project root directory:
 
 &#x23; | Command | Description
---- |--- | ---
+--- | --- | ---
 1 | `mvn clean install -f root.xml` | Install root.xml artifact to your local Maven repository (usually `~/.m2/repository/` directory).
 2 | `mvn clean install -f version.xml` |
 3 | `mvn clean install -f build.xml` |

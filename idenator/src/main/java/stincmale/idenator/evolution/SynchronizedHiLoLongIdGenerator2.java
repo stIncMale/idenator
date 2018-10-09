@@ -57,10 +57,8 @@ public final class SynchronizedHiLoLongIdGenerator2 extends AbstractHiLoLongIdGe
   }
 
   private final long initializedHi() {
-    long hi = this.hi;
     if (hi == UNINITIALIZED) {
       hi = nextHi();
-      this.hi = hi;
     }
     return hi;
   }

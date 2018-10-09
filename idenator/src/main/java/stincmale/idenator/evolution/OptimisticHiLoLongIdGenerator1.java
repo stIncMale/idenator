@@ -13,28 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package stincmale.idenator;
+
+package stincmale.idenator.evolution;
 
 import java.util.concurrent.atomic.AtomicLong;
+import stincmale.idenator.AbstractHiLoLongIdGenerator;
+import stincmale.idenator.HiValueGenerator;
 import stincmale.idenator.doc.ThreadSafe;
 
 /**
  * A concurrent non-consecutive implementation of {@link AbstractHiLoLongIdGenerator}.
  */
-//TODO pick the best implementation from evolution package
 @ThreadSafe
-public final class ConcurrentHiLoLongIdGenerator extends AbstractHiLoLongIdGenerator {
+public final class OptimisticHiLoLongIdGenerator1 extends AbstractHiLoLongIdGenerator {
   private final Object mutex;
   private final AtomicLong lo;
   private volatile long hi;
 
-  /**
-   * @param hiValueGenerator See {@link AbstractHiLoLongIdGenerator#AbstractHiLoLongIdGenerator(HiValueGenerator, long)}.
-   * @param loUpperBoundOpen This parameter specifies how many identifiers we can {@linkplain #generate() generate}
-   * after calling {@link #nextHi()} without calling {@link #nextHi()} again.
-   * <i>lo</i> ∈ [0; {@code loUpperBoundOpen}).
-   */
-  public ConcurrentHiLoLongIdGenerator(final HiValueGenerator hiValueGenerator, final long loUpperBoundOpen) {
+  public OptimisticHiLoLongIdGenerator1(final HiValueGenerator hiValueGenerator, final long loUpperBoundOpen) {
     super(hiValueGenerator, loUpperBoundOpen);
     mutex = new Object();
     lo = new AtomicLong(-1);
@@ -44,17 +40,12 @@ public final class ConcurrentHiLoLongIdGenerator extends AbstractHiLoLongIdGener
   @Override
   public final long generate() {
     final long loUpperBoundOpen = getLoUpperBoundOpen();
-    long hi = UNINITIALIZED;
-    long lo = UNINITIALIZED;
-    final int maxAttempts = 32;
-    for (int attemptIdx = 0; attemptIdx <= maxAttempts; attemptIdx++) {
-      final boolean optimisticAttempt = attemptIdx < maxAttempts;
-      if (optimisticAttempt) {
-        hi = initializedHi();
-        lo = this.lo.incrementAndGet();
-      }
-      if (lo >= loUpperBoundOpen ||//lo is too big, we need to reset lo and advance hi
-        !optimisticAttempt) {//no optimistic attempts left, it's time to use locking
+    long hi;
+    long lo;
+    while (true) {//each iteration starts with an optimistic read attempt
+      hi = initializedHi();
+      lo = this.lo.incrementAndGet();
+      if (lo >= loUpperBoundOpen) {//lo is too big, we probably need to reset lo and advance hi
         synchronized (mutex) {
           lo = this.lo.incrementAndGet();
           if (lo >= loUpperBoundOpen) {//re-check whether we still need to reset lo and advance hi
@@ -68,10 +59,9 @@ public final class ConcurrentHiLoLongIdGenerator extends AbstractHiLoLongIdGener
           break;//hi+lo read was atomic because it was made under the exclusive lock
         }
       } else {//lo is fine, check whether optimistic read succeeded
-        long hi2 = this.hi;
-        if (hi2 == hi) {//optimistic read succeeded, hence read hi+lo was atomic and we can break the loop
+        if (this.hi == hi) {//optimistic read succeeded, hence read hi+lo was atomic and we can break the loop
           break;
-        }// else continue this while loop because hi was changed while we were reading lo, so we can't guarantee that the hi+lo read is atomic
+        }//else continue this while loop because hi was changed while we were reading lo, so we can't guarantee that the hi+lo read is atomic
       }
     }
     return calculateId(hi, lo, loUpperBoundOpen);

@@ -43,7 +43,7 @@ public final class SynchronizedHiLoLongIdGenerator2 extends AbstractHiLoLongIdGe
     final long hi;
     long lo;
     synchronized (mutex) {
-      lo = ++this.lo;
+      lo = ++this.lo;//increment then assign
       if (lo >= loUpperBoundOpen) {//lo is too big, we need to reset lo and advance hi
         lo = 0;
         this.lo = lo;

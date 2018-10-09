@@ -31,12 +31,13 @@ import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
-import stincmale.idenator.ConcurrentHiLoLongIdGenerator;
 import stincmale.idenator.InMemoryHiValueGenerator;
 import stincmale.idenator.auxiliary.GaussianSleeper;
 import stincmale.idenator.auxiliary.NoopSleeper;
-import stincmale.idenator.evolution.OptimisticHiLoLongIdGenerator;
-import stincmale.idenator.evolution.StampedLockHiLoLongIdGenerator;
+import stincmale.idenator.evolution.OptimisticHiLoLongIdGenerator1;
+import stincmale.idenator.evolution.OptimisticHiLoLongIdGenerator2;
+import stincmale.idenator.evolution.StampedLockHiLoLongIdGenerator1;
+import stincmale.idenator.evolution.StampedLockHiLoLongIdGenerator2;
 import stincmale.idenator.evolution.SynchronizedHiLoLongIdGenerator1;
 import stincmale.idenator.evolution.SynchronizedHiLoLongIdGenerator2;
 import stincmale.idenator.performance.util.JmhOptions;
@@ -58,11 +59,6 @@ public class LongIdGeneratorPerformanceTest {
       .run();
   }
 
-  //  @Test
-  //  public final void throughputThreads1() throws RunnerException {
-  //    runThroughputBenchmarks(1);
-  //  }
-
   @Test
   public final void throughputThreads4() throws RunnerException {
     runThroughputBenchmarks(4);
@@ -73,105 +69,125 @@ public class LongIdGeneratorPerformanceTest {
     runThroughputBenchmarks(32);
   }
 
-  //  @Benchmark
-  //  public final long synchronized1NoSleepBigLo(final BenchmarkState state) {
-  //    return state.synchronized1NoSleepBigLo.generate();
-  //  }
-  //
-  //  @Benchmark
-  //  public final long synchronized1NoSleepSmallLo(final BenchmarkState state) {
-  //    return state.synchronized1NoSleepSmallLo.generate();
-  //  }
-  //
-  //  @Benchmark
-  //  public final long synchronized1SleepBigLo(final BenchmarkState state) {
-  //    return state.synchronized1SleepBigLo.generate();
-  //  }
-  //
-  //  @Benchmark
-  //  public final long synchronized1SleepSmallLo(final BenchmarkState state) {
-  //    return state.synchronized1SleepSmallLo.generate();
-  //  }
-  //
-  //  @Benchmark
-  //  public final long synchronized2NoSleepBigLo(final BenchmarkState state) {
-  //    return state.synchronized2NoSleepBigLo.generate();
-  //  }
-  //
-  //  @Benchmark
-  //  public final long synchronized2NoSleepSmallLo(final BenchmarkState state) {
-  //    return state.synchronized2NoSleepSmallLo.generate();
-  //  }
-  //
-  //  @Benchmark
-  //  public final long synchronized2SleepBigLo(final BenchmarkState state) {
-  //    return state.synchronized2SleepBigLo.generate();
-  //  }
-  //
-  //  @Benchmark
-  //  public final long synchronized2SleepSmallLo(final BenchmarkState state) {
-  //    return state.synchronized1SleepSmallLo.generate();
-  //  }
-
   @Benchmark
-  public final long stampedLockNoSleepBigLo(final BenchmarkState state) {
-    return state.stampedLockNoSleepBigLo.generate();
+  public final long synchronized1NoSleepBigLo(final BenchmarkState state) {
+    return state.synchronized1NoSleepBigLo.generate();
   }
 
   @Benchmark
-  public final long stampedLockNoSleepSmallLo(final BenchmarkState state) {
-    return state.stampedLockNoSleepSmallLo.generate();
-  }
-
-  //  @Benchmark
-  //  public final long stampedLockSleepBigLo(final BenchmarkState state) {
-  //    return state.stampedLockSleepBigLo.generate();
-  //  }
-  //
-  //  @Benchmark
-  //  public final long stampedLockSleepSmallLo(final BenchmarkState state) {
-  //    return state.stampedLockSleepSmallLo.generate();
-  //  }
-
-  @Benchmark
-  public final long optimisticNoSleepBigLo(final BenchmarkState state) {
-    return state.optimisticNoSleepBigLo.generate();
+  public final long synchronized1NoSleepSmallLo(final BenchmarkState state) {
+    return state.synchronized1NoSleepSmallLo.generate();
   }
 
   @Benchmark
-  public final long optimisticNoSleepSmallLo(final BenchmarkState state) {
-    return state.optimisticNoSleepSmallLo.generate();
-  }
-
-  //  @Benchmark
-  //  public final long optimisticSleepBigLo(final BenchmarkState state) {
-  //    return state.optimisticSleepBigLo.generate();
-  //  }
-  //
-  //  @Benchmark
-  //  public final long optimisticSleepSmallLo(final BenchmarkState state) {
-  //    return state.stampedLock1SleepSmallLo.generate();
-  //  }
-
-  @Benchmark
-  public final long concurrentNoSleepBigLo(final BenchmarkState state) {
-    return state.concurrentNoSleepBigLo.generate();
+  public final long synchronized1SleepBigLo(final BenchmarkState state) {
+    return state.synchronized1SleepBigLo.generate();
   }
 
   @Benchmark
-  public final long concurrentNoSleepSmallLo(final BenchmarkState state) {
-    return state.concurrentNoSleepSmallLo.generate();
+  public final long synchronized1SleepSmallLo(final BenchmarkState state) {
+    return state.synchronized1SleepSmallLo.generate();
   }
 
-  //  @Benchmark
-  //  public final long concurrentSleepBigLo(final BenchmarkState state) {
-  //    return state.concurrentSleepBigLo.generate();
-  //  }
-  //
-  //  @Benchmark
-  //  public final long concurrentSleepSmallLo(final BenchmarkState state) {
-  //    return state.concurrentSleepSmallLo.generate();
-  //  }
+  @Benchmark
+  public final long synchronized2NoSleepBigLo(final BenchmarkState state) {
+    return state.synchronized2NoSleepBigLo.generate();
+  }
+
+  @Benchmark
+  public final long synchronized2NoSleepSmallLo(final BenchmarkState state) {
+    return state.synchronized2NoSleepSmallLo.generate();
+  }
+
+  @Benchmark
+  public final long synchronized2SleepBigLo(final BenchmarkState state) {
+    return state.synchronized2SleepBigLo.generate();
+  }
+
+  @Benchmark
+  public final long synchronized2SleepSmallLo(final BenchmarkState state) {
+    return state.synchronized2SleepSmallLo.generate();
+  }
+
+  @Benchmark
+  public final long stampedLock1NoSleepBigLo(final BenchmarkState state) {
+    return state.stampedLock1NoSleepBigLo.generate();
+  }
+
+  @Benchmark
+  public final long stampedLock1NoSleepSmallLo(final BenchmarkState state) {
+    return state.stampedLock1NoSleepSmallLo.generate();
+  }
+
+  @Benchmark
+  public final long stampedLock1SleepBigLo(final BenchmarkState state) {
+    return state.stampedLock1SleepBigLo.generate();
+  }
+
+  @Benchmark
+  public final long stampedLock1SleepSmallLo(final BenchmarkState state) {
+    return state.stampedLock1SleepSmallLo.generate();
+  }
+
+  @Benchmark
+  public final long stampedLock2NoSleepBigLo(final BenchmarkState state) {
+    return state.stampedLock2NoSleepBigLo.generate();
+  }
+
+  @Benchmark
+  public final long stampedLock2NoSleepSmallLo(final BenchmarkState state) {
+    return state.stampedLock2NoSleepSmallLo.generate();
+  }
+
+  @Benchmark
+  public final long stampedLock2SleepBigLo(final BenchmarkState state) {
+    return state.stampedLock2SleepBigLo.generate();
+  }
+
+  @Benchmark
+  public final long stampedLock2SleepSmallLo(final BenchmarkState state) {
+    return state.stampedLock2SleepSmallLo.generate();
+  }
+
+  @Benchmark
+  public final long optimistic1NoSleepBigLo(final BenchmarkState state) {
+    return state.optimistic1NoSleepBigLo.generate();
+  }
+
+  @Benchmark
+  public final long optimistic1NoSleepSmallLo(final BenchmarkState state) {
+    return state.optimistic1NoSleepSmallLo.generate();
+  }
+
+  @Benchmark
+  public final long optimistic1SleepBigLo(final BenchmarkState state) {
+    return state.optimistic1SleepBigLo.generate();
+  }
+
+  @Benchmark
+  public final long optimistic1SleepSmallLo(final BenchmarkState state) {
+    return state.optimistic1SleepSmallLo.generate();
+  }
+
+  @Benchmark
+  public final long optimistic2NoSleepBigLo(final BenchmarkState state) {
+    return state.optimistic2NoSleepBigLo.generate();
+  }
+
+  @Benchmark
+  public final long optimistic2NoSleepSmallLo(final BenchmarkState state) {
+    return state.optimistic2NoSleepSmallLo.generate();
+  }
+
+  @Benchmark
+  public final long optimistic2SleepBigLo(final BenchmarkState state) {
+    return state.optimistic2SleepBigLo.generate();
+  }
+
+  @Benchmark
+  public final long optimistic2SleepSmallLo(final BenchmarkState state) {
+    return state.optimistic2SleepSmallLo.generate();
+  }
 
   @State(Scope.Benchmark)
   public static class BenchmarkState {
@@ -183,18 +199,22 @@ public class LongIdGeneratorPerformanceTest {
     private SynchronizedHiLoLongIdGenerator2 synchronized2NoSleepSmallLo;
     private SynchronizedHiLoLongIdGenerator2 synchronized2SleepBigLo;
     private SynchronizedHiLoLongIdGenerator2 synchronized2SleepSmallLo;
-    private StampedLockHiLoLongIdGenerator stampedLockNoSleepBigLo;
-    private StampedLockHiLoLongIdGenerator stampedLockNoSleepSmallLo;
-    private StampedLockHiLoLongIdGenerator stampedLockSleepBigLo;
-    private StampedLockHiLoLongIdGenerator stampedLockSleepSmallLo;
-    private OptimisticHiLoLongIdGenerator optimisticNoSleepBigLo;
-    private OptimisticHiLoLongIdGenerator optimisticNoSleepSmallLo;
-    private OptimisticHiLoLongIdGenerator optimisticSleepBigLo;
-    private OptimisticHiLoLongIdGenerator optimisticSleepSmallLo;
-    private ConcurrentHiLoLongIdGenerator concurrentNoSleepBigLo;
-    private ConcurrentHiLoLongIdGenerator concurrentNoSleepSmallLo;
-    private ConcurrentHiLoLongIdGenerator concurrentSleepBigLo;
-    private ConcurrentHiLoLongIdGenerator concurrentSleepSmallLo;
+    private StampedLockHiLoLongIdGenerator1 stampedLock1NoSleepBigLo;
+    private StampedLockHiLoLongIdGenerator1 stampedLock1NoSleepSmallLo;
+    private StampedLockHiLoLongIdGenerator1 stampedLock1SleepBigLo;
+    private StampedLockHiLoLongIdGenerator1 stampedLock1SleepSmallLo;
+    private StampedLockHiLoLongIdGenerator2 stampedLock2NoSleepBigLo;
+    private StampedLockHiLoLongIdGenerator2 stampedLock2NoSleepSmallLo;
+    private StampedLockHiLoLongIdGenerator2 stampedLock2SleepBigLo;
+    private StampedLockHiLoLongIdGenerator2 stampedLock2SleepSmallLo;
+    private OptimisticHiLoLongIdGenerator1 optimistic1NoSleepBigLo;
+    private OptimisticHiLoLongIdGenerator1 optimistic1NoSleepSmallLo;
+    private OptimisticHiLoLongIdGenerator1 optimistic1SleepBigLo;
+    private OptimisticHiLoLongIdGenerator1 optimistic1SleepSmallLo;
+    private OptimisticHiLoLongIdGenerator2 optimistic2NoSleepBigLo;
+    private OptimisticHiLoLongIdGenerator2 optimistic2NoSleepSmallLo;
+    private OptimisticHiLoLongIdGenerator2 optimistic2SleepBigLo;
+    private OptimisticHiLoLongIdGenerator2 optimistic2SleepSmallLo;
 
     public BenchmarkState() {
     }
@@ -214,18 +234,22 @@ public class LongIdGeneratorPerformanceTest {
       synchronized2NoSleepSmallLo = new SynchronizedHiLoLongIdGenerator2(hiValueGenNoSleepCreator.get(), smallLo);
       synchronized2SleepBigLo = new SynchronizedHiLoLongIdGenerator2(hiValueGenSleepCreator.get(), bigLo);
       synchronized2SleepSmallLo = new SynchronizedHiLoLongIdGenerator2(hiValueGenSleepCreator.get(), smallLo);
-      stampedLockNoSleepBigLo = new StampedLockHiLoLongIdGenerator(hiValueGenNoSleepCreator.get(), bigLo);
-      stampedLockNoSleepSmallLo = new StampedLockHiLoLongIdGenerator(hiValueGenNoSleepCreator.get(), smallLo);
-      stampedLockSleepBigLo = new StampedLockHiLoLongIdGenerator(hiValueGenSleepCreator.get(), bigLo);
-      stampedLockSleepSmallLo = new StampedLockHiLoLongIdGenerator(hiValueGenSleepCreator.get(), smallLo);
-      optimisticNoSleepBigLo = new OptimisticHiLoLongIdGenerator(hiValueGenNoSleepCreator.get(), bigLo);
-      optimisticNoSleepSmallLo = new OptimisticHiLoLongIdGenerator(hiValueGenNoSleepCreator.get(), smallLo);
-      optimisticSleepBigLo = new OptimisticHiLoLongIdGenerator(hiValueGenSleepCreator.get(), bigLo);
-      optimisticSleepSmallLo = new OptimisticHiLoLongIdGenerator(hiValueGenSleepCreator.get(), smallLo);
-      concurrentNoSleepBigLo = new ConcurrentHiLoLongIdGenerator(hiValueGenNoSleepCreator.get(), bigLo);
-      concurrentNoSleepSmallLo = new ConcurrentHiLoLongIdGenerator(hiValueGenNoSleepCreator.get(), smallLo);
-      concurrentSleepBigLo = new ConcurrentHiLoLongIdGenerator(hiValueGenSleepCreator.get(), bigLo);
-      concurrentSleepSmallLo = new ConcurrentHiLoLongIdGenerator(hiValueGenSleepCreator.get(), smallLo);
+      stampedLock1NoSleepBigLo = new StampedLockHiLoLongIdGenerator1(hiValueGenNoSleepCreator.get(), bigLo);
+      stampedLock1NoSleepSmallLo = new StampedLockHiLoLongIdGenerator1(hiValueGenNoSleepCreator.get(), smallLo);
+      stampedLock1SleepBigLo = new StampedLockHiLoLongIdGenerator1(hiValueGenSleepCreator.get(), bigLo);
+      stampedLock1SleepSmallLo = new StampedLockHiLoLongIdGenerator1(hiValueGenSleepCreator.get(), smallLo);
+      stampedLock2NoSleepBigLo = new StampedLockHiLoLongIdGenerator2(hiValueGenNoSleepCreator.get(), bigLo);
+      stampedLock2NoSleepSmallLo = new StampedLockHiLoLongIdGenerator2(hiValueGenNoSleepCreator.get(), smallLo);
+      stampedLock2SleepBigLo = new StampedLockHiLoLongIdGenerator2(hiValueGenSleepCreator.get(), bigLo);
+      stampedLock2SleepSmallLo = new StampedLockHiLoLongIdGenerator2(hiValueGenSleepCreator.get(), smallLo);
+      optimistic1NoSleepBigLo = new OptimisticHiLoLongIdGenerator1(hiValueGenNoSleepCreator.get(), bigLo);
+      optimistic1NoSleepSmallLo = new OptimisticHiLoLongIdGenerator1(hiValueGenNoSleepCreator.get(), smallLo);
+      optimistic1SleepBigLo = new OptimisticHiLoLongIdGenerator1(hiValueGenSleepCreator.get(), bigLo);
+      optimistic1SleepSmallLo = new OptimisticHiLoLongIdGenerator1(hiValueGenSleepCreator.get(), smallLo);
+      optimistic2NoSleepBigLo = new OptimisticHiLoLongIdGenerator2(hiValueGenNoSleepCreator.get(), bigLo);
+      optimistic2NoSleepSmallLo = new OptimisticHiLoLongIdGenerator2(hiValueGenNoSleepCreator.get(), smallLo);
+      optimistic2SleepBigLo = new OptimisticHiLoLongIdGenerator2(hiValueGenSleepCreator.get(), bigLo);
+      optimistic2SleepSmallLo = new OptimisticHiLoLongIdGenerator2(hiValueGenSleepCreator.get(), smallLo);
     }
   }
 }

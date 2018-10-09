@@ -25,10 +25,10 @@ import stincmale.idenator.util.TestTag;
 
 @Tag(TestTag.UNIT)
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
-final class StampedLockHiLoLongIdGeneratorTest extends AbstractLongIdGeneratorUnitTest {
-  private StampedLockHiLoLongIdGeneratorTest() {
+final class StampedLockHiLoLongIdGenerator1Test extends AbstractLongIdGeneratorUnitTest {
+  private StampedLockHiLoLongIdGenerator1Test() {
     super(
-      () -> new StampedLockHiLoLongIdGenerator(new InMemoryHiValueGenerator(0, NoopSleeper.instance()), 1),
-      () -> new StampedLockHiLoLongIdGenerator(new InMemoryHiValueGenerator(0, NoopSleeper.instance()), 10));
+      () -> new StampedLockHiLoLongIdGenerator1(new InMemoryHiValueGenerator(0, NoopSleeper.instance()), 1),
+      () -> new StampedLockHiLoLongIdGenerator1(new InMemoryHiValueGenerator(0, NoopSleeper.instance()), 10));
   }
 }

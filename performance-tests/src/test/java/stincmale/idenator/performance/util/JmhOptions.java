@@ -16,14 +16,13 @@
 
 package stincmale.idenator.performance.util;
 
-import static java.lang.Boolean.parseBoolean;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import static org.openjdk.jmh.runner.options.TimeValue.milliseconds;
 import stincmale.idenator.doc.NotThreadSafe;
 
 @NotThreadSafe
 public final class JmhOptions {
-  private static final boolean JAVA_BIASED_LOCKING = parseBoolean(System.getProperty("stincmale.idenator.performance.biasedLocking", "true"));
+  private static final boolean JAVA_DISABLE_BIASED_LOCKING = false;
   private static final boolean JAVA_SERVER = true;
   private static final boolean JAVA_ASSERTIONS = false;
 
@@ -42,18 +41,20 @@ public final class JmhOptions {
     result.jvmArgs("-Xms1048m", "-Xmx1048m")
       .jvmArgsAppend(
         JAVA_SERVER ? "-server" : "-client",
-        JAVA_ASSERTIONS ? "-enableassertions" : "-disableassertions",
-        JAVA_BIASED_LOCKING ? "-XX:+UseBiasedLocking" : "-XX:-UseBiasedLocking")
+        JAVA_ASSERTIONS ? "-enableassertions" : "-disableassertions")
       .shouldDoGC(false)
       .syncIterations(true)
       .shouldFailOnError(true)
       .threads(1)
       .timeout(milliseconds(5_000));
-    result.forks(1)
+    if (JAVA_DISABLE_BIASED_LOCKING) {
+      result.jvmArgsAppend("-XX:-UseBiasedLocking");
+    }
+    result.forks(10)
       .warmupTime(milliseconds(200))
       .warmupIterations(10)
-      .measurementTime(milliseconds(400))
-      .measurementIterations(10);
+      .measurementTime(milliseconds(300))
+      .measurementIterations(15);
     return result;
   }
 }

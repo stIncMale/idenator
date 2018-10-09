@@ -25,10 +25,10 @@ import stincmale.idenator.util.TestTag;
 
 @Tag(TestTag.CONCURRENCY)
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
-final class OptimisticHiLoLongIdGeneratorConcurrencyTest extends AbstractLongIdGeneratorConcurrencyTest {
-  private OptimisticHiLoLongIdGeneratorConcurrencyTest() {
+final class OptimisticHiLoLongIdGenerator2ConcurrencyTest extends AbstractLongIdGeneratorConcurrencyTest {
+  private OptimisticHiLoLongIdGenerator2ConcurrencyTest() {
     super(2 * Math.max(2, Runtime.getRuntime().availableProcessors()),
-      () -> new OptimisticHiLoLongIdGenerator(new InMemoryHiValueGenerator(0, NoopSleeper.instance()), 1),
-      () -> new OptimisticHiLoLongIdGenerator(new InMemoryHiValueGenerator(0, NoopSleeper.instance()), 10));
+      () -> new OptimisticHiLoLongIdGenerator2(new InMemoryHiValueGenerator(0, NoopSleeper.instance()), 1),
+      () -> new OptimisticHiLoLongIdGenerator2(new InMemoryHiValueGenerator(0, NoopSleeper.instance()), 10));
   }
 }

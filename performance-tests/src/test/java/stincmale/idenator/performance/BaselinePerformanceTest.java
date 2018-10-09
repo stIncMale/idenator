@@ -20,6 +20,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.StampedLock;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -34,6 +35,7 @@ import org.openjdk.jmh.runner.RunnerException;
 import stincmale.idenator.performance.util.JmhOptions;
 import stincmale.idenator.performance.util.TestTag;
 
+@Disabled
 @Tag(TestTag.PERFORMANCE)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class BaselinePerformanceTest {

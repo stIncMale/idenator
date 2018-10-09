@@ -18,17 +18,17 @@ package stincmale.idenator.evolution;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.TestInstance;
-import stincmale.idenator.AbstractLongIdGeneratorUnitTest;
+import stincmale.idenator.AbstractLongIdGeneratorConcurrencyTest;
 import stincmale.idenator.InMemoryHiValueGenerator;
 import stincmale.idenator.auxiliary.NoopSleeper;
 import stincmale.idenator.util.TestTag;
 
-@Tag(TestTag.UNIT)
+@Tag(TestTag.CONCURRENCY)
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
-final class OptimisticHiLoLongIdGeneratorTest extends AbstractLongIdGeneratorUnitTest {
-  private OptimisticHiLoLongIdGeneratorTest() {
-    super(
-      () -> new OptimisticHiLoLongIdGenerator(new InMemoryHiValueGenerator(0, NoopSleeper.instance()), 1),
-      () -> new OptimisticHiLoLongIdGenerator(new InMemoryHiValueGenerator(0, NoopSleeper.instance()), 10));
+final class StampedLockHiLoLongIdGenerator1ConcurrencyTest extends AbstractLongIdGeneratorConcurrencyTest {
+  private StampedLockHiLoLongIdGenerator1ConcurrencyTest() {
+    super(2 * Math.max(2, Runtime.getRuntime().availableProcessors()),
+      () -> new StampedLockHiLoLongIdGenerator1(new InMemoryHiValueGenerator(0, NoopSleeper.instance()), 1),
+      () -> new StampedLockHiLoLongIdGenerator1(new InMemoryHiValueGenerator(0, NoopSleeper.instance()), 10));
   }
 }

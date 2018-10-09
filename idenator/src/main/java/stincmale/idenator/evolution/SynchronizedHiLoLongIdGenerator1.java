@@ -41,8 +41,7 @@ public final class SynchronizedHiLoLongIdGenerator1 extends AbstractHiLoLongIdGe
   public final long generate() {
     synchronized (mutex) {
       final long loUpperBoundOpen = getLoUpperBoundOpen();
-      ++this.lo;
-      if (lo >= loUpperBoundOpen) {//lo is too big, we need to reset lo and advance hi
+      if (++lo >= loUpperBoundOpen) {//lo is too big, we need to reset lo and advance hi
         lo = 0;
         hi = nextHi();
       } else {//lo is fine

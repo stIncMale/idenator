@@ -16,8 +16,13 @@
 
 package stincmale.idenator;
 
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.TestInstance;
 import stincmale.idenator.auxiliary.NoopSleeper;
+import stincmale.idenator.util.TestTag;
 
+@Tag(TestTag.UNIT)
+@TestInstance(TestInstance.Lifecycle.PER_METHOD)
 final class ConcurrentHiLoLongIdGeneratorTest extends AbstractLongIdGeneratorUnitTest {
   private ConcurrentHiLoLongIdGeneratorTest() {
     super(

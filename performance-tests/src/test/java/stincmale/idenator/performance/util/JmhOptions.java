@@ -39,7 +39,7 @@ public final class JmhOptions {
 
   public static final OptionsBuilder get() {
     final OptionsBuilder result = new OptionsBuilder();
-    result.jvmArgs("-Xms1024m", "-Xmx1024m")
+    result.jvmArgs("-Xms1048m", "-Xmx1048m")
       .jvmArgsAppend(
         JAVA_SERVER ? "-server" : "-client",
         JAVA_ASSERTIONS ? "-enableassertions" : "-disableassertions",
@@ -48,12 +48,12 @@ public final class JmhOptions {
       .syncIterations(true)
       .shouldFailOnError(true)
       .threads(1)
-      .timeout(milliseconds(60_000));
-    result.forks(4)
-      .warmupTime(milliseconds(300))
-      .warmupIterations(7)
-      .measurementTime(milliseconds(500))
-      .measurementIterations(5);
+      .timeout(milliseconds(5_000));
+    result.forks(1)
+      .warmupTime(milliseconds(200))
+      .warmupIterations(10)
+      .measurementTime(milliseconds(400))
+      .measurementIterations(10);
     return result;
   }
 }

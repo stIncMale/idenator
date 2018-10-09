@@ -58,9 +58,10 @@
             <trimStackTrace>false</trimStackTrace>
             <useUnlimitedThreads>false</useUnlimitedThreads>
             <enableAssertions>true</enableAssertions>
-            <argLine><!--TODO something like this should be done by the plugin implicitly-->
+            <argLine><!--TODO something like this should be done by the plugin implicitly for testing-->
               --add-opens stincmale.idenator/stincmale.idenator=ALL-UNNAMED
               --add-opens stincmale.idenator/stincmale.idenator.auxiliary=ALL-UNNAMED
+              --add-opens stincmale.idenator/stincmale.idenator.evolution=ALL-UNNAMED
             </argLine>
           </configuration>
           <dependencies><!--TODO with the next version of the plugin this should be unnecessary-->

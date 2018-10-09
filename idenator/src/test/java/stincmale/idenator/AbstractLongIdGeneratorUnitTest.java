@@ -18,14 +18,13 @@ package stincmale.idenator;
 
 import java.util.function.Supplier;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import stincmale.idenator.util.TestTag;
 
-@Tag(TestTag.UNIT)
-@TestInstance(TestInstance.Lifecycle.PER_METHOD)
-abstract class AbstractLongIdGeneratorUnitTest extends AbstractLongIdGeneratorTest {
+/**
+ * Currently, this test expects only strictly increasing {@link LongIdGenerator}s
+ * which start with 0 identifier and generate consecutive identifiers when used sequentially.
+ */
+public abstract class AbstractLongIdGeneratorUnitTest extends AbstractLongIdGeneratorTest {
   @SafeVarargs
   protected AbstractLongIdGeneratorUnitTest(final Supplier<LongIdGenerator>... longIdGeneratorCreators) {
     super(longIdGeneratorCreators);

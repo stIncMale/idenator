@@ -26,21 +26,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import stincmale.idenator.util.TestTag;
 
-@Tag(TestTag.CONCURRENCY)
-@TestInstance(TestInstance.Lifecycle.PER_METHOD)
-abstract class AbstractLongIdGeneratorConcurrencyTest extends AbstractLongIdGeneratorTest {
+/**
+ * Currently, this test expects only strictly increasing {@link LongIdGenerator}s.
+ */
+//TODO create tests with https://github.com/Devexperts/lin-check
+public abstract class AbstractLongIdGeneratorConcurrencyTest extends AbstractLongIdGeneratorTest {
   private final int numberOfThreads;
   private ExecutorService ex;
 
-  protected AbstractLongIdGeneratorConcurrencyTest(
-    final Supplier<LongIdGenerator> longIdGeneratorCreator,
-    final int numberOfThreads) {
-    super(longIdGeneratorCreator);
+  @SafeVarargs
+  protected AbstractLongIdGeneratorConcurrencyTest(final int numberOfThreads, final Supplier<LongIdGenerator>... longIdGeneratorCreators) {
+    super(longIdGeneratorCreators);
     this.numberOfThreads = numberOfThreads;
   }
 
@@ -81,13 +79,14 @@ abstract class AbstractLongIdGeneratorConcurrencyTest extends AbstractLongIdGene
     }
     assertNull(firstDuplicateId.get(), String.format("Generated id %s more than once from %s", firstDuplicateId.get(), idGen));
     assertEquals(numberOfThreads * numberOfIdsPerThread, uniqueIds.size(), idGen.toString());
+    //LongIdGenerator is allowed to generate non-consecutive identifiers, thus we are asserting <=
     assertTrue(numberOfThreads * numberOfIdsPerThread - 1 <= uniqueIds.lastKey(), idGen.toString());
   }
 
   @Test
   final void test() {
-    final int numberOfTestIterations = 10_000;
-    final int numberOfIdsPerThread = 3000;
+    final int numberOfTestIterations = 4000;
+    final int numberOfIdsPerThread = 4000;
     getLongIdGeneratorCreators().forEach(idGenCreator -> {
       for (int i = 1; i <= numberOfTestIterations; i++) {
         doTest(idGenCreator.get(), numberOfThreads, numberOfIdsPerThread, ex);

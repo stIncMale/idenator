@@ -21,7 +21,7 @@ import stincmale.idenator.doc.NotThreadSafe;
 import static stincmale.idenator.internal.util.Preconditions.checkNotNull;
 
 /**
- * A concurrent not persistent implementation of {@link HiValueGenerator}.
+ * A concurrent non-persistent strictly increasing consecutive implementation of {@link HiValueGenerator}.
  */
 @NotThreadSafe
 public final class InMemoryHiValueGenerator implements HiValueGenerator {

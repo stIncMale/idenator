@@ -14,13 +14,8 @@
  * limitations under the License.
  */
 
-package stincmale.idenator;
-
-import stincmale.idenator.auxiliary.NoopSleeper;
-
-final class SynchronizedHiLoLongIdGeneratorConcurrencyTest extends AbstractLongIdGeneratorConcurrencyTest {
-  private SynchronizedHiLoLongIdGeneratorConcurrencyTest() {
-    super(() -> new SynchronizedHiLoLongIdGenerator(new InMemoryHiValueGenerator(0, NoopSleeper.instance()), 10),
-      2 * Math.max(2, Runtime.getRuntime().availableProcessors()));
-  }
-}
+/**
+ * Contains sample implementations of {@link stincmale.idenator.LongIdGenerator}
+ * showing evolution from the simplest implementation to {@link stincmale.idenator.ConcurrentHiLoLongIdGenerator}.
+ */
+package stincmale.idenator.evolution;

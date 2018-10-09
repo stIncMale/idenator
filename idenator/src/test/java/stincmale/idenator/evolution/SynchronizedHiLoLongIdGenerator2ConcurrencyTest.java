@@ -14,19 +14,21 @@
  * limitations under the License.
  */
 
-package stincmale.idenator;
+package stincmale.idenator.evolution;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.TestInstance;
+import stincmale.idenator.AbstractLongIdGeneratorConcurrencyTest;
+import stincmale.idenator.InMemoryHiValueGenerator;
 import stincmale.idenator.auxiliary.NoopSleeper;
 import stincmale.idenator.util.TestTag;
 
 @Tag(TestTag.CONCURRENCY)
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
-final class ConcurrentHiLoLongIdGeneratorConcurrencyTest extends AbstractLongIdGeneratorConcurrencyTest {
-  private ConcurrentHiLoLongIdGeneratorConcurrencyTest() {
+final class SynchronizedHiLoLongIdGenerator2ConcurrencyTest extends AbstractLongIdGeneratorConcurrencyTest {
+  private SynchronizedHiLoLongIdGenerator2ConcurrencyTest() {
     super(2 * Math.max(2, Runtime.getRuntime().availableProcessors()),
-      () -> new ConcurrentHiLoLongIdGenerator(new InMemoryHiValueGenerator(0, NoopSleeper.instance()), 1),
-      () -> new ConcurrentHiLoLongIdGenerator(new InMemoryHiValueGenerator(0, NoopSleeper.instance()), 10));
+      () -> new SynchronizedHiLoLongIdGenerator2(new InMemoryHiValueGenerator(0, NoopSleeper.instance()), 1),
+      () -> new SynchronizedHiLoLongIdGenerator2(new InMemoryHiValueGenerator(0, NoopSleeper.instance()), 10));
   }
 }

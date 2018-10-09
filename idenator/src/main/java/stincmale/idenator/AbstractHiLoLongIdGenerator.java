@@ -15,12 +15,17 @@
  */
 package stincmale.idenator;
 
-import stincmale.idenator.doc.ThreadSafe;
 import static stincmale.idenator.internal.util.Preconditions.checkArgument;
 import static stincmale.idenator.internal.util.Preconditions.checkNotNull;
 
 /**
  * An abstract <a href="https://vladmihalcea.com/the-hilo-algorithm/">Hi/Lo</a> {@link LongIdGenerator}.
+ * {@link AbstractHiLoLongIdGenerator} is:
+ * <ul>
+ * <li>persistent if the supplied {@link HiValueGenerator} is, and non-persistent otherwise</li>
+ * <li>strictly increasing if the supplied {@link HiValueGenerator} is, and non-monotonic otherwise</li>
+ * <li>non-consecutive if the supplied {@link HiValueGenerator} is, otherwise this property is defined by implementations</li>
+ * </ul>
  */
 public abstract class AbstractHiLoLongIdGenerator implements LongIdGenerator {
   /**
@@ -33,8 +38,6 @@ public abstract class AbstractHiLoLongIdGenerator implements LongIdGenerator {
 
   /**
    * @param hiValueGenerator A <i>hi</i> value generator.
-   * It must be {@link ThreadSafe} is this implementation of {@link AbstractHiLoLongIdGenerator} is {@link ThreadSafe}.
-   * If {@code hiValueGenerator} is persistent, then the constructed {@link AbstractHiLoLongIdGenerator} is persistent.
    * @param loUpperBoundOpen This parameter specifies how many identifiers we can {@linkplain #generate() generate}
    * after obtaining a new <i>hi</i> value without retrieving the next <i>hi</i> value again.
    * <p>
@@ -55,10 +58,12 @@ public abstract class AbstractHiLoLongIdGenerator implements LongIdGenerator {
    * @param lo A <i>lo</i> value which is a looped in-memory counter.
    * <i>lo</i> ∈ [0; {@code loUpperBoundOpen}).
    * @param loUpperBoundOpen See {@link #AbstractHiLoLongIdGenerator(HiValueGenerator, long)}.
-   * @return The identifier corresponding to the supplied {@code hi} and {@code lo},
-   * which uniquely define the identifier for a given {@code loUpperBoundOpen}.
+   * @return The identifier uniquely defined by the supplied {@code hi}, {@code lo} and {@code loUpperBoundOpen}.
    */
   protected static final long calculateId(final long hi, final long lo, final long loUpperBoundOpen) {
+    checkArgument(hi != UNINITIALIZED, "hi", () -> String.format("Must not be equal to %s", UNINITIALIZED));
+    checkArgument(lo >= 0, "lo", "Must not be negative");
+    checkArgument(lo < loUpperBoundOpen, "lo", () -> String.format("Must be less than %s=%s", "loUpperBoundOpen", loUpperBoundOpen));
     return hi * loUpperBoundOpen + lo;
   }
 

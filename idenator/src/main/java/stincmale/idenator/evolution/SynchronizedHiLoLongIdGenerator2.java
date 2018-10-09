@@ -14,41 +14,54 @@
  * limitations under the License.
  */
 
-package stincmale.idenator;
+package stincmale.idenator.evolution;
 
+import stincmale.idenator.AbstractHiLoLongIdGenerator;
+import stincmale.idenator.HiValueGenerator;
 import stincmale.idenator.doc.ThreadSafe;
 
+/**
+ * A synchronized implementation of {@link AbstractHiLoLongIdGenerator}.
+ * {@link SynchronizedHiLoLongIdGenerator2} is consecutive if the supplied {@link HiValueGenerator} is consecutive.
+ */
 @ThreadSafe
-public final class SynchronizedHiLoLongIdGenerator extends AbstractHiLoLongIdGenerator {
+public final class SynchronizedHiLoLongIdGenerator2 extends AbstractHiLoLongIdGenerator {
   private final Object mutex;
-  private long hi;
   private long lo;
+  private long hi;
 
-  public SynchronizedHiLoLongIdGenerator(final HiValueGenerator hiValueGenerator, final long loUpperBoundOpen) {
+  public SynchronizedHiLoLongIdGenerator2(final HiValueGenerator hiValueGenerator, final long loUpperBoundOpen) {
     super(hiValueGenerator, loUpperBoundOpen);
-    hi = UNINITIALIZED;
-    lo = -1;
     mutex = new Object();
+    lo = -1;
+    hi = UNINITIALIZED;
   }
 
   @Override
   public final long generate() {
     final long loUpperBoundOpen = getLoUpperBoundOpen();
     final long hi;
-    final long lo;
+    long lo;
     synchronized (mutex) {
-      this.lo++;
-      if (this.lo >= loUpperBoundOpen) {//lo is too big, we need to reset lo and advance hi
-        this.hi = nextHi();
-        this.lo = 0;
+      lo = ++this.lo;
+      if (lo >= loUpperBoundOpen) {//lo is too big, we need to reset lo and advance hi
+        lo = 0;
+        this.lo = lo;
+        hi = nextHi();
+        this.hi = hi;
       } else {//lo is fine
-        if (this.hi == UNINITIALIZED) {//initialize hi if needed
-          this.hi = nextHi();
-        }
+        hi = initializedHi();
       }
-      hi = this.hi;
-      lo = this.lo;
     }
     return calculateId(hi, lo, loUpperBoundOpen);
+  }
+
+  private final long initializedHi() {
+    long hi = this.hi;
+    if (hi == UNINITIALIZED) {
+      hi = nextHi();
+      this.hi = hi;
+    }
+    return hi;
   }
 }

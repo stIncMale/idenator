@@ -15,13 +15,11 @@
  */
 package stincmale.idenator.auxiliary;
 
-import stincmale.idenator.doc.NotThreadSafe;
-
 /**
  * An object allowing to put a thread calling {@link #sleep()} into {@link Thread.State#TIMED_WAITING} state
  * for a duration decided be the implementation.
  */
-@NotThreadSafe
+@FunctionalInterface
 public interface Sleeper {
   /**
    * Puts a thread calling this method into {@link Thread.State#TIMED_WAITING} for a duration decided be the implementation.

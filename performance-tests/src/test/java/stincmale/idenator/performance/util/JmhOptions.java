@@ -22,9 +22,10 @@ import stincmale.idenator.doc.NotThreadSafe;
 
 @NotThreadSafe
 public final class JmhOptions {
-  private static final boolean JAVA_DISABLE_BIASED_LOCKING = false;
   private static final boolean JAVA_SERVER = true;
   private static final boolean JAVA_ASSERTIONS = false;
+  private static final boolean JAVA_DISABLE_BIASED_LOCKING = false;
+  private static final boolean JAVA_DISABLE_GC = true;
 
   private JmhOptions() {
     throw new UnsupportedOperationException();
@@ -38,7 +39,7 @@ public final class JmhOptions {
 
   public static final OptionsBuilder get() {
     final OptionsBuilder result = new OptionsBuilder();
-    result.jvmArgs("-Xms1048m", "-Xmx1048m")
+    result.jvmArgs("-Xms2096m", "-Xmx2096m")
       .jvmArgsAppend(
         JAVA_SERVER ? "-server" : "-client",
         JAVA_ASSERTIONS ? "-enableassertions" : "-disableassertions")
@@ -50,11 +51,14 @@ public final class JmhOptions {
     if (JAVA_DISABLE_BIASED_LOCKING) {
       result.jvmArgsAppend("-XX:-UseBiasedLocking");
     }
-    result.forks(10)
+    if (JAVA_DISABLE_GC) {
+      result.jvmArgsAppend("-XX:+UnlockExperimentalVMOptions", "-XX:+UseEpsilonGC");
+    }
+    result.forks(3)
       .warmupTime(milliseconds(200))
       .warmupIterations(10)
-      .measurementTime(milliseconds(300))
-      .measurementIterations(15);
+      .measurementTime(milliseconds(200))
+      .measurementIterations(10);
     return result;
   }
 }

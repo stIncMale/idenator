@@ -19,30 +19,29 @@ import java.util.concurrent.atomic.AtomicLong;
 import stincmale.idenator.doc.ThreadSafe;
 
 /**
- * A concurrent non-consecutive implementation of {@link AbstractHiLoLongIdGenerator}.
+ * A {@linkplain ThreadSafe thread-safe} implementation of {@link AbstractTwoPhaseLongIdGenerator}.
  */
-//TODO pick the best implementation from evolution package
 @ThreadSafe
-public final class ConcurrentHiLoLongIdGenerator extends AbstractHiLoLongIdGenerator {
+public final class ConcurrentTwoPhaseLongIdGenerator extends AbstractTwoPhaseLongIdGenerator {
   private final Object mutex;
   private final AtomicLong lo;
   private volatile long hi;
 
   /**
-   * @param hiValueGenerator See {@link AbstractHiLoLongIdGenerator#AbstractHiLoLongIdGenerator(HiValueGenerator, long)}.
-   * @param loUpperBoundOpen This parameter specifies how many identifiers we can {@linkplain #generate() generate}
-   * after calling {@link #nextHi()} without calling {@link #nextHi()} again.
-   * <i>lo</i> ∈ [0; {@code loUpperBoundOpen}).
+   * @param hiGenerator See {@link AbstractTwoPhaseLongIdGenerator#AbstractTwoPhaseLongIdGenerator(LongIdGenerator, long, boolean)}.
+   * @param loUpperBoundOpen See
+   * {@link AbstractTwoPhaseLongIdGenerator#AbstractTwoPhaseLongIdGenerator(LongIdGenerator, long, boolean)}.
+   * @param pooled See {@link AbstractTwoPhaseLongIdGenerator#AbstractTwoPhaseLongIdGenerator(LongIdGenerator, long, boolean)}.
    */
-  public ConcurrentHiLoLongIdGenerator(final HiValueGenerator hiValueGenerator, final long loUpperBoundOpen) {
-    super(hiValueGenerator, loUpperBoundOpen);
+  public ConcurrentTwoPhaseLongIdGenerator(final LongIdGenerator hiGenerator, final long loUpperBoundOpen, final boolean pooled) {
+    super(hiGenerator, loUpperBoundOpen, pooled);
     mutex = new Object();
     lo = new AtomicLong(-1);
     hi = UNINITIALIZED;
   }
 
   @Override
-  public final long generate() {
+  public final long next() {
     final long loUpperBoundOpen = getLoUpperBoundOpen();
     long hi = UNINITIALIZED;
     long lo = UNINITIALIZED;
@@ -58,7 +57,7 @@ public final class ConcurrentHiLoLongIdGenerator extends AbstractHiLoLongIdGener
         synchronized (mutex) {
           lo = this.lo.incrementAndGet();
           if (lo >= loUpperBoundOpen) {//re-check whether we still need to reset lo and advance hi
-            hi = nextHi();
+            hi = nextId();
             this.hi = hi;
             lo = 0;
             this.lo.set(lo);
@@ -74,7 +73,7 @@ public final class ConcurrentHiLoLongIdGenerator extends AbstractHiLoLongIdGener
         }// else continue this while loop because hi was changed while we were reading lo, so we can't guarantee that the hi+lo read is atomic
       }
     }
-    return calculateId(hi, lo, loUpperBoundOpen);
+    return calculateId(hi, lo);
   }
 
   private final long initializedHi() {
@@ -83,7 +82,7 @@ public final class ConcurrentHiLoLongIdGenerator extends AbstractHiLoLongIdGener
       synchronized (mutex) {
         hi = this.hi;
         if (hi == UNINITIALIZED) {
-          hi = nextHi();
+          hi = nextId();
           this.hi = hi;
         }
       }

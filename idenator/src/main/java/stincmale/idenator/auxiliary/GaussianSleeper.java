@@ -20,6 +20,7 @@ import java.time.Duration;
 import stincmale.idenator.doc.ThreadSafe;
 import static stincmale.idenator.internal.util.Preconditions.checkArgument;
 import static stincmale.idenator.internal.util.Preconditions.checkNotNull;
+import static stincmale.idenator.internal.util.Utils.format;
 
 /**
  * A {@link Sleeper} that {@linkplain #sleep() sleeps} for a duration
@@ -40,7 +41,7 @@ public final class GaussianSleeper implements Sleeper {
     checkNotNull(absoluteDeviation, "absoluteDeviation");
     checkArgument(!absoluteDeviation.isNegative(), "absoluteDeviation", "Must not be negative");
     checkArgument(absoluteDeviation.compareTo(midrange) <= 0, "absoluteDeviation",
-      () -> String.format("%s=%s must be less than or equal to %s=%s", "absoluteDeviation", absoluteDeviation, "midrange", midrange));
+      () -> format("%s=%s must be less than or equal to %s=%s", "absoluteDeviation", absoluteDeviation, "midrange", midrange));
     rnd = new GaussianRandom(midrange.toMillis(), absoluteDeviation.toMillis());
   }
 

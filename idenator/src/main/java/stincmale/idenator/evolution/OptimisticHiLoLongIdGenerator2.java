@@ -17,28 +17,28 @@
 package stincmale.idenator.evolution;
 
 import java.util.concurrent.atomic.AtomicLong;
-import stincmale.idenator.AbstractHiLoLongIdGenerator;
-import stincmale.idenator.HiValueGenerator;
+import stincmale.idenator.AbstractTwoPhaseLongIdGenerator;
+import stincmale.idenator.LongIdGenerator;
 import stincmale.idenator.doc.ThreadSafe;
 
 /**
- * A concurrent non-consecutive implementation of {@link AbstractHiLoLongIdGenerator}.
+ * A concurrent non-consecutive implementation of {@link AbstractTwoPhaseLongIdGenerator}.
  */
 @ThreadSafe
-public final class OptimisticHiLoLongIdGenerator2 extends AbstractHiLoLongIdGenerator {
+public final class OptimisticHiLoLongIdGenerator2 extends AbstractTwoPhaseLongIdGenerator {
   private final Object mutex;
   private final AtomicLong lo;
   private volatile long hi;
 
-  public OptimisticHiLoLongIdGenerator2(final HiValueGenerator hiValueGenerator, final long loUpperBoundOpen) {
-    super(hiValueGenerator, loUpperBoundOpen);
+  public OptimisticHiLoLongIdGenerator2(final LongIdGenerator hiGenerator, final long loUpperBoundOpen, final boolean pooled) {
+    super(hiGenerator, loUpperBoundOpen, pooled);
     mutex = new Object();
     lo = new AtomicLong(-1);
     hi = UNINITIALIZED;
   }
 
   @Override
-  public final long generate() {
+  public final long next() {
     final long loUpperBoundOpen = getLoUpperBoundOpen();
     long hi = UNINITIALIZED;
     long lo = UNINITIALIZED;
@@ -54,7 +54,7 @@ public final class OptimisticHiLoLongIdGenerator2 extends AbstractHiLoLongIdGene
         synchronized (mutex) {
           lo = this.lo.incrementAndGet();
           if (lo >= loUpperBoundOpen) {//re-check whether we still need to reset lo and advance hi
-            hi = nextHi();
+            hi = nextId();
             this.hi = hi;
             lo = 0;
             this.lo.set(lo);
@@ -69,7 +69,7 @@ public final class OptimisticHiLoLongIdGenerator2 extends AbstractHiLoLongIdGene
         }//else continue this while loop because hi was changed while we were reading lo, so we can't guarantee that the hi+lo read is atomic
       }
     }
-    return calculateId(hi, lo, loUpperBoundOpen);
+    return calculateId(hi, lo);
   }
 
   private final long initializedHi() {
@@ -78,7 +78,7 @@ public final class OptimisticHiLoLongIdGenerator2 extends AbstractHiLoLongIdGene
       synchronized (mutex) {
         hi = this.hi;
         if (hi == UNINITIALIZED) {
-          hi = nextHi();
+          hi = nextId();
           this.hi = hi;
         }
       }

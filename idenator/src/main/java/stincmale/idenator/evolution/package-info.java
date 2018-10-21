@@ -16,6 +16,6 @@
 
 /**
  * Contains sample implementations of {@link stincmale.idenator.LongIdGenerator}
- * showing evolution from the simplest implementation to {@link stincmale.idenator.ConcurrentHiLoLongIdGenerator}.
+ * showing evolution from the simplest implementation to {@link stincmale.idenator.ConcurrentTwoPhaseLongIdGenerator}.
  */
 package stincmale.idenator.evolution;

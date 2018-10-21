@@ -16,30 +16,67 @@
 
 package stincmale.idenator;
 
-import java.util.function.Supplier;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
+import static stincmale.idenator.internal.util.Utils.format;
 
 /**
- * Currently, this test expects only strictly increasing {@link LongIdGenerator}s
- * which start with 0 identifier and generate consecutive identifiers when used sequentially.
+ * This test expects strictly increasing {@link AbstractTwoPhaseLongIdGenerator}s
+ * which do not skip identifiers when used sequentially unless this is required by the specification.
  */
 public abstract class AbstractLongIdGeneratorUnitTest extends AbstractLongIdGeneratorTest {
-  @SafeVarargs
-  protected AbstractLongIdGeneratorUnitTest(final Supplier<LongIdGenerator>... longIdGeneratorCreators) {
+  protected AbstractLongIdGeneratorUnitTest(final LongIdGeneratorCreatorAndParams... longIdGeneratorCreators) {
     super(longIdGeneratorCreators);
   }
 
-  @Test
-  final void generate() {
-    getLongIdGeneratorCreators().forEach(idGenCreator -> {
-      final LongIdGenerator idGen = idGenCreator.get();
-      assertEquals(0, idGen.generate(), idGen.toString());
-      final int iterations = 15;
-      for (int i = 0; i < iterations; i++) {
-        idGen.generate();
+  private final static void testNextPooled(final LongIdGeneratorCreatorAndParams idGenCreator) {
+    final LongIdGenerator idGen = idGenCreator.get();
+    long id = idGen.next();
+    assertEquals(idGenCreator.getStartHi(), id, idGen.toString());
+    final int numberOfIterations = 200 * Math.toIntExact(idGenCreator.getLoUpperBoundOpen());
+    int numberOfIdGenNextCalls = 1;
+    int numberOfTimesLoValuesWereExhausted = 1;
+    for (int i = 0; i < numberOfIterations; i++) {
+      final boolean exhaustedLoValues = numberOfIdGenNextCalls % idGenCreator.getLoUpperBoundOpen() == 0;
+      final long newId;
+      if (exhaustedLoValues) {
+        numberOfTimesLoValuesWereExhausted++;
+        if (numberOfTimesLoValuesWereExhausted % 2 == 0) {
+          newId = idGenCreator.getHiGenerator().next();
+        } else {
+          newId = idGen.next();
+          numberOfIdGenNextCalls++;
+        }
+      } else {
+        newId = idGen.next();
+        numberOfIdGenNextCalls++;
       }
-      assertEquals(iterations + 1, idGen.generate(), idGen.toString());
+      assertTrue(newId - id > 0, format("i=%s, numberOfIdGenNextCalls=%s, numberOfTimesLoValuesWereExhausted=%s, newId=%s, id=%s, idGen=%s",
+        i, numberOfIdGenNextCalls, numberOfTimesLoValuesWereExhausted, newId, id, idGen.toString()));
+      id = newId;
+    }
+  }
+
+  private final static void testNextHiLo(final LongIdGeneratorCreatorAndParams idGenCreator) {
+    final LongIdGenerator idGen = idGenCreator.get();
+    long id = idGen.next();
+    final int numberOfIterations = 200 * Math.toIntExact(idGenCreator.getLoUpperBoundOpen());
+    for (int i = 0; i < numberOfIterations; i++) {
+      final long newId = idGen.next();
+      assertTrue(newId - id > 0, format("i=%s, newId=%s, id=%s, idGen=%s", i, newId, id, idGen.toString()));
+      id = newId;
+    }
+  }
+
+  @Test
+  final void next() {
+    getLongIdGeneratorCreators().forEach(idGenCreator -> {
+      if (idGenCreator.isPooled()) {
+        testNextPooled(idGenCreator);
+      } else {
+        testNextHiLo(idGenCreator);
+      }
     });
   }
 }

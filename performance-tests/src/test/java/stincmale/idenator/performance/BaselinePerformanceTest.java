@@ -17,7 +17,6 @@ package stincmale.idenator.performance;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.StampedLock;
 import org.junit.jupiter.api.Disabled;
@@ -87,7 +86,7 @@ public class BaselinePerformanceTest {
 
   @Benchmark
   public final long reentrantRWLockIncrement(final BaselinePerformanceTest.BenchmarkState state) {
-    final Lock lock = state.lock;
+    final ReentrantReadWriteLock.WriteLock lock = state.lock;
     lock.lock();
     try {
       return state.plainLong++;
@@ -105,7 +104,7 @@ public class BaselinePerformanceTest {
   public static class BenchmarkState {
     private Object mutex;
     private StampedLock stampedLock;
-    private Lock lock;
+    private ReentrantReadWriteLock.WriteLock lock;
     private long plainLong;
     private AtomicLong atomicLong;
 

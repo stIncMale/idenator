@@ -16,44 +16,44 @@
 
 package stincmale.idenator.evolution;
 
-import stincmale.idenator.AbstractHiLoLongIdGenerator;
-import stincmale.idenator.HiValueGenerator;
+import stincmale.idenator.AbstractTwoPhaseLongIdGenerator;
+import stincmale.idenator.LongIdGenerator;
 import stincmale.idenator.doc.ThreadSafe;
 
 /**
- * A synchronized implementation of {@link AbstractHiLoLongIdGenerator}.
- * {@link SynchronizedHiLoLongIdGenerator1} is consecutive if the supplied {@link HiValueGenerator} is consecutive.
+ * A synchronized implementation of {@link AbstractTwoPhaseLongIdGenerator}.
+ * {@link SynchronizedHiLoLongIdGenerator1} is consecutive if the supplied {@link LongIdGenerator} is consecutive.
  */
 @ThreadSafe
-public final class SynchronizedHiLoLongIdGenerator1 extends AbstractHiLoLongIdGenerator {
+public final class SynchronizedHiLoLongIdGenerator1 extends AbstractTwoPhaseLongIdGenerator {
   private final Object mutex;
   private long lo;
   private long hi;
 
-  public SynchronizedHiLoLongIdGenerator1(final HiValueGenerator hiValueGenerator, final long loUpperBoundOpen) {
-    super(hiValueGenerator, loUpperBoundOpen);
+  public SynchronizedHiLoLongIdGenerator1(final LongIdGenerator hiGenerator, final long loUpperBoundOpen, final boolean pooled) {
+    super(hiGenerator, loUpperBoundOpen, pooled);
     mutex = new Object();
     lo = -1;
     hi = UNINITIALIZED;
   }
 
   @Override
-  public final long generate() {
+  public final long next() {
     synchronized (mutex) {
       final long loUpperBoundOpen = getLoUpperBoundOpen();
       if (++lo >= loUpperBoundOpen) {//lo is too big, we need to reset lo and advance hi
         lo = 0;
-        hi = nextHi();
+        hi = nextId();
       } else {//lo is fine
         hi = initializedHi();
       }
-      return calculateId(hi, lo, loUpperBoundOpen);
+      return calculateId(hi, lo);
     }
   }
 
   private final long initializedHi() {
     if (hi == UNINITIALIZED) {
-      hi = nextHi();
+      hi = nextId();
     }
     return hi;
   }

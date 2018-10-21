@@ -19,22 +19,71 @@ package stincmale.idenator;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Supplier;
+import stincmale.idenator.auxiliary.EphemeralStrictlyIncreasingHiGenerator;
+import stincmale.idenator.auxiliary.NoopSleeper;
 import static stincmale.idenator.internal.util.Preconditions.checkArgument;
 import static stincmale.idenator.internal.util.Preconditions.checkNotNull;
 
-abstract class AbstractLongIdGeneratorTest {
-  private final Collection<Supplier<LongIdGenerator>> idGenCreators;
+public abstract class AbstractLongIdGeneratorTest {
+  private final Collection<LongIdGeneratorCreatorAndParams> idGenCreators;
 
-  @SafeVarargs
-  protected AbstractLongIdGeneratorTest(final Supplier<LongIdGenerator>... longIdGeneratorCreators) {
+  protected AbstractLongIdGeneratorTest(final LongIdGeneratorCreatorAndParams... longIdGeneratorCreators) {
     checkNotNull(longIdGeneratorCreators, "longIdGeneratorCreators");
     checkArgument(longIdGeneratorCreators.length > 0, "longIdGeneratorCreators", "Must not be empty");
-    @SuppressWarnings("varargs")
-    final Collection<Supplier<LongIdGenerator>> idGenCreators = List.of(longIdGeneratorCreators);
-    this.idGenCreators = idGenCreators;
+    this.idGenCreators = List.of(longIdGeneratorCreators);
   }
 
-  protected final Collection<Supplier<LongIdGenerator>> getLongIdGeneratorCreators() {
+  protected final Collection<LongIdGeneratorCreatorAndParams> getLongIdGeneratorCreators() {
     return idGenCreators;
+  }
+
+  protected interface LongIdGeneratorCreator {
+    AbstractTwoPhaseLongIdGenerator create(final LongIdGenerator hiGenerator, final long loUpperBoundOpen, final boolean pooled);
+  }
+
+  protected static final class LongIdGeneratorCreatorAndParams implements Supplier<AbstractTwoPhaseLongIdGenerator> {
+    private final LongIdGeneratorCreator creator;
+    private final LongIdGenerator hiGenerator;
+    private final long startHi;
+    private final long loUpperBoundOpen;
+    private final boolean pooled;
+
+    public LongIdGeneratorCreatorAndParams(
+      final LongIdGeneratorCreator creator,
+      final long startHi,
+      final long loUpperBoundOpen,
+      final boolean pooled) {
+      checkArgument(loUpperBoundOpen > 0, "loUpperBoundOpen", "Must be positive");
+      this.creator = checkNotNull(creator, "creator");
+      this.hiGenerator = new EphemeralStrictlyIncreasingHiGenerator(startHi, pooled ? loUpperBoundOpen - 1 : 0, NoopSleeper.instance());
+      this.startHi = startHi;
+      this.loUpperBoundOpen = loUpperBoundOpen;
+      this.pooled = pooled;
+    }
+
+    @Override
+    public AbstractTwoPhaseLongIdGenerator get() {
+      return creator.create(hiGenerator, loUpperBoundOpen, pooled);
+    }
+
+    public final LongIdGeneratorCreator getCreator() {
+      return creator;
+    }
+
+    public final LongIdGenerator getHiGenerator() {
+      return hiGenerator;
+    }
+
+    public final long getStartHi() {
+      return startHi;
+    }
+
+    public final long getLoUpperBoundOpen() {
+      return loUpperBoundOpen;
+    }
+
+    public final boolean isPooled() {
+      return pooled;
+    }
   }
 }

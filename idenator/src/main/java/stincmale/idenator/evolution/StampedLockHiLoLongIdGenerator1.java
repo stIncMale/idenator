@@ -18,28 +18,28 @@ package stincmale.idenator.evolution;
 
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.StampedLock;
-import stincmale.idenator.AbstractHiLoLongIdGenerator;
-import stincmale.idenator.HiValueGenerator;
+import stincmale.idenator.AbstractTwoPhaseLongIdGenerator;
+import stincmale.idenator.LongIdGenerator;
 import stincmale.idenator.doc.ThreadSafe;
 
 /**
- * A concurrent non-consecutive implementation of {@link AbstractHiLoLongIdGenerator}.
+ * A concurrent non-consecutive implementation of {@link AbstractTwoPhaseLongIdGenerator}.
  */
 @ThreadSafe
-public final class StampedLockHiLoLongIdGenerator1 extends AbstractHiLoLongIdGenerator {
+public final class StampedLockHiLoLongIdGenerator1 extends AbstractTwoPhaseLongIdGenerator {
   private final StampedLock lock;
   private final AtomicLong lo;
   private long hi;
 
-  public StampedLockHiLoLongIdGenerator1(final HiValueGenerator hiValueGenerator, final long loUpperBoundOpen) {
-    super(hiValueGenerator, loUpperBoundOpen);
+  public StampedLockHiLoLongIdGenerator1(final LongIdGenerator hiGenerator, final long loUpperBoundOpen, final boolean pooled) {
+    super(hiGenerator, loUpperBoundOpen, pooled);
     lock = new StampedLock();
     lo = new AtomicLong(-1);
     hi = UNINITIALIZED;
   }
 
   @Override
-  public final long generate() {
+  public final long next() {
     final long loUpperBoundOpen = getLoUpperBoundOpen();
     long hi;
     long lo;
@@ -57,7 +57,7 @@ public final class StampedLockHiLoLongIdGenerator1 extends AbstractHiLoLongIdGen
           if (lo >= loUpperBoundOpen) {//re-check whether we still need to reset lo and advance hi
             lo = 0;
             this.lo.set(lo);
-            hi = nextHi();
+            hi = nextId();
             this.hi = hi;
           } else {//lo is fine, but we still need to read hi under the exclusive lock to make sure that hi+lo read is atomic
             hi = this.hi;
@@ -72,7 +72,7 @@ public final class StampedLockHiLoLongIdGenerator1 extends AbstractHiLoLongIdGen
         }//else continue this while loop because hi was changed while we were reading lo, so we can't guarantee that the hi+lo read is atomic
       }
     }
-    return calculateId(hi, lo, loUpperBoundOpen);
+    return calculateId(hi, lo);
   }
 
   private final long initializeHi(long optimisticStamp) {
@@ -82,7 +82,7 @@ public final class StampedLockHiLoLongIdGenerator1 extends AbstractHiLoLongIdGen
       try {
         hi = this.hi;
         if (hi == UNINITIALIZED) {
-          hi = nextHi();
+          hi = nextId();
           this.hi = hi;
         }
       } finally {

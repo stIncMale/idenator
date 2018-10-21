@@ -28,7 +28,7 @@ final class GaussianRandomTest {
   private GaussianRandomTest() {
   }
 
-  private static final void assertBounds(final GaussianRandom rnd) {
+  private static final void testNext(final GaussianRandom rnd) {
     final double min = rnd.getMidrange() - rnd.getAbsoluteDeviation();
     final double max = rnd.getMidrange() + rnd.getAbsoluteDeviation();
     for (int i = 0; i < 1000_000; i++) {
@@ -40,9 +40,9 @@ final class GaussianRandomTest {
 
   @Test
   final void next() {
-    assertBounds(new GaussianRandom(1, 0));
-    assertBounds(new GaussianRandom(1, 1));
-    assertBounds(new GaussianRandom(1234, 111));
-    assertBounds(new GaussianRandom(Double.MAX_VALUE / 2d, Double.MAX_VALUE / 2d));
+    testNext(new GaussianRandom(1, 0));
+    testNext(new GaussianRandom(1, 1));
+    testNext(new GaussianRandom(1234, 111));
+    testNext(new GaussianRandom(Double.MAX_VALUE / 2d, Double.MAX_VALUE / 2d));
   }
 }

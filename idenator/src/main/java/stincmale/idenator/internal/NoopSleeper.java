@@ -13,11 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package stincmale.idenator.internal;
+
+import stincmale.idenator.doc.ThreadSafe;
 
 /**
- * Provides tools for generating identifiers.
+ * An implementation of {@link Sleeper} which never puts a thread into {@link Thread.State#TIMED_WAITING} state.
  */
-module stincmale.idenator {
-  exports stincmale.idenator;
-  exports stincmale.idenator.doc;
+@ThreadSafe
+public final class NoopSleeper implements Sleeper {
+  private static final NoopSleeper instance = new NoopSleeper();
+
+  private NoopSleeper() {
+  }
+
+  /**
+   * Always returns the same instance.
+   *
+   * @return An instance of {@link NoopSleeper}.
+   */
+  public static final NoopSleeper instance() {
+    return instance;
+  }
+
+  /**
+   * Does nothing.
+   */
+  @Override
+  public final void sleep() {
+  }
 }

@@ -31,18 +31,18 @@ import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import stincmale.idenator.LongIdGenerator;
-import stincmale.idenator.auxiliary.EphemeralStrictlyIncreasingHiGenerator;
-import stincmale.idenator.auxiliary.GaussianSleeper;
-import stincmale.idenator.auxiliary.NoopSleeper;
+import stincmale.idenator.internal.EphemeralStrictlyIncreasingHiGenerator;
+import stincmale.idenator.internal.GaussianSleeper;
+import stincmale.idenator.internal.NoopSleeper;
+import stincmale.idenator.internal.variant.OptimisticTwoPhaseLongIdGenerator1;
+import stincmale.idenator.internal.variant.OptimisticTwoPhaseLongIdGenerator2;
+import stincmale.idenator.internal.variant.OptimisticTwoPhaseLongIdGenerator3;
+import stincmale.idenator.internal.variant.StampedTwoPhaseLongIdGenerator1;
+import stincmale.idenator.internal.variant.StampedTwoPhaseLongIdGenerator2;
+import stincmale.idenator.internal.variant.SynchronizedTwoPhaseLongIdGenerator1;
+import stincmale.idenator.internal.variant.SynchronizedTwoPhaseLongIdGenerator2;
 import stincmale.idenator.performance.util.JmhOptions;
 import stincmale.idenator.performance.util.TestTag;
-import stincmale.idenator.variant.OptimisticTwoPhaseLongIdGenerator1;
-import stincmale.idenator.variant.OptimisticTwoPhaseLongIdGenerator2;
-import stincmale.idenator.variant.OptimisticTwoPhaseLongIdGenerator3;
-import stincmale.idenator.variant.StampedTwoPhaseLongIdGenerator1;
-import stincmale.idenator.variant.StampedTwoPhaseLongIdGenerator2;
-import stincmale.idenator.variant.SynchronizedTwoPhaseLongIdGenerator1;
-import stincmale.idenator.variant.SynchronizedTwoPhaseLongIdGenerator2;
 
 @Tag(TestTag.PERFORMANCE)
 @TestInstance(Lifecycle.PER_CLASS)

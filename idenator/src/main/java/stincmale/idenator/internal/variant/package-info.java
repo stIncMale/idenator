@@ -15,9 +15,6 @@
  */
 
 /**
- * Provides tools for generating identifiers.
+ * Contains sample implementations of {@link stincmale.idenator.AbstractTwoPhaseLongIdGenerator}.
  */
-module stincmale.idenator {
-  exports stincmale.idenator;
-  exports stincmale.idenator.doc;
-}
+package stincmale.idenator.internal.variant;

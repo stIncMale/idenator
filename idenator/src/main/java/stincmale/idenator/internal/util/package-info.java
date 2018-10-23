@@ -15,6 +15,6 @@
  */
 
 /**
- * Contains library tools and utilities for internal use.
+ * Contains library tools and utilities.
  */
 package stincmale.idenator.internal.util;

@@ -29,8 +29,8 @@ import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
-import stincmale.idenator.auxiliary.EphemeralStrictlyIncreasingHiGenerator;
-import stincmale.idenator.auxiliary.GaussianSleeper;
+import stincmale.idenator.internal.EphemeralStrictlyIncreasingHiGenerator;
+import stincmale.idenator.internal.GaussianSleeper;
 import stincmale.idenator.performance.util.JmhOptions;
 import stincmale.idenator.performance.util.TestTag;
 

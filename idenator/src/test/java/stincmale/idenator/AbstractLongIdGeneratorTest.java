@@ -19,8 +19,8 @@ package stincmale.idenator;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Supplier;
-import stincmale.idenator.auxiliary.EphemeralStrictlyIncreasingHiGenerator;
-import stincmale.idenator.auxiliary.NoopSleeper;
+import stincmale.idenator.internal.EphemeralStrictlyIncreasingHiGenerator;
+import stincmale.idenator.internal.NoopSleeper;
 import static stincmale.idenator.internal.util.Preconditions.checkArgument;
 import static stincmale.idenator.internal.util.Preconditions.checkNotNull;
 

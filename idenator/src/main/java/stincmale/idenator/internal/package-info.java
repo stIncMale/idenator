@@ -15,9 +15,6 @@
  */
 
 /**
- * Provides tools for generating identifiers.
+ * Contains classes for internal use.
  */
-module stincmale.idenator {
-  exports stincmale.idenator;
-  exports stincmale.idenator.doc;
-}
+package stincmale.idenator.internal;

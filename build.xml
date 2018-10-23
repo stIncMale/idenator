@@ -60,14 +60,15 @@
             <enableAssertions>true</enableAssertions>
             <forkCount>1</forkCount>
             <reuseForks>true</reuseForks>
-            <argLine><!--TODO something like this should be done by the plugin implicitly for testing-->
+            <argLine>
+              -Xfuture
               -Xmx1024m
               --add-opens stincmale.idenator/stincmale.idenator=ALL-UNNAMED
               --add-opens stincmale.idenator/stincmale.idenator.auxiliary=ALL-UNNAMED
               --add-opens stincmale.idenator/stincmale.idenator.evolution=ALL-UNNAMED
             </argLine>
           </configuration>
-          <dependencies><!--TODO with the next version of the plugin this should be unnecessary-->
+          <dependencies>
             <dependency>
               <groupId>org.ow2.asm</groupId>
               <artifactId>asm</artifactId>
@@ -111,7 +112,7 @@
             <detectLinks>false</detectLinks>
             <validateLinks>true</validateLinks>
             <links>
-              <link>https://docs.oracle.com/en/java/javase/11/docs/api</link>
+              <link>https://docs.oracle.com/en/java/javase/11/docs/api</link><!-- TODO links to JDK API are not working -->
             </links>
             <includeDependencySources>false</includeDependencySources>
             <includeTransitiveDependencySources>false</includeTransitiveDependencySources>

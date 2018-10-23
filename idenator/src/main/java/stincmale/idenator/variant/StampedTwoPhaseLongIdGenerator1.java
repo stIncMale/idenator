@@ -14,25 +14,23 @@
  * limitations under the License.
  */
 
-package stincmale.idenator.evolution;
+package stincmale.idenator.variant;
 
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.StampedLock;
 import stincmale.idenator.AbstractTwoPhaseLongIdGenerator;
 import stincmale.idenator.LongIdGenerator;
 import stincmale.idenator.doc.ThreadSafe;
 
-/**
- * A concurrent non-consecutive implementation of {@link AbstractTwoPhaseLongIdGenerator}.
- */
 @ThreadSafe
-public final class OptimisticHiLoLongIdGenerator2 extends AbstractTwoPhaseLongIdGenerator {
-  private final Object mutex;
+public final class StampedTwoPhaseLongIdGenerator1 extends AbstractTwoPhaseLongIdGenerator {
+  private final StampedLock lock;
   private final AtomicLong lo;
-  private volatile long hi;
+  private long hi;
 
-  public OptimisticHiLoLongIdGenerator2(final LongIdGenerator hiGenerator, final long loUpperBoundOpen, final boolean pooled) {
+  public StampedTwoPhaseLongIdGenerator1(final LongIdGenerator hiGenerator, final long loUpperBoundOpen, final boolean pooled) {
     super(hiGenerator, loUpperBoundOpen, pooled);
-    mutex = new Object();
+    lock = new StampedLock();
     lo = new AtomicLong(-1);
     hi = UNINITIALIZED;
   }
@@ -40,31 +38,33 @@ public final class OptimisticHiLoLongIdGenerator2 extends AbstractTwoPhaseLongId
   @Override
   public final long next() {
     final long loUpperBoundOpen = getLoUpperBoundOpen();
-    long hi = UNINITIALIZED;
-    long lo = UNINITIALIZED;
-    final int maxAttempts = 32;
-    for (int attemptIdx = 0; attemptIdx <= maxAttempts; attemptIdx++) {
-      final boolean optimisticAttempt = attemptIdx < maxAttempts;
-      if (optimisticAttempt) {
-        hi = initializedHi();
-        lo = this.lo.incrementAndGet();
+    long hi;
+    long lo;
+    while (true) {
+      final long optimisticStamp = initializeHi(lock.tryOptimisticRead());
+      if (optimisticStamp == 0) {//failed to start optimistic read
+        continue;
       }
-      if (lo >= loUpperBoundOpen ||//lo is too big, we probably need to reset lo and advance hi
-        !optimisticAttempt) {//no optimistic attempts left, it's time to use locking
-        synchronized (mutex) {
+      hi = this.hi;
+      lo = this.lo.incrementAndGet();
+      if (lo >= loUpperBoundOpen) {//lo is too big, we probably need to reset lo and advance hi
+        final long exclusiveStamp = lock.writeLock();
+        try {
           lo = this.lo.incrementAndGet();
           if (lo >= loUpperBoundOpen) {//re-check whether we still need to reset lo and advance hi
-            hi = nextId();
-            this.hi = hi;
             lo = 0;
             this.lo.set(lo);
+            hi = nextId();
+            this.hi = hi;
           } else {//lo is fine, but we still need to read hi under the exclusive lock to make sure that hi+lo read is atomic
             hi = this.hi;
           }
           break;//hi+lo read was atomic because it was made under the exclusive lock
+        } finally {
+          lock.unlockWrite(exclusiveStamp);
         }
       } else {//lo is fine, check whether optimistic read succeeded
-        if (this.hi == hi) {//optimistic read succeeded, hence read hi+lo was atomic and we can break the loop
+        if (lock.validate(optimisticStamp)) {//optimistic read succeeded, hence read hi+lo was atomic and we can break the loop
           break;
         }//else continue this while loop because hi was changed while we were reading lo, so we can't guarantee that the hi+lo read is atomic
       }
@@ -72,17 +72,18 @@ public final class OptimisticHiLoLongIdGenerator2 extends AbstractTwoPhaseLongId
     return calculateId(hi, lo);
   }
 
-  private final long initializedHi() {
-    long hi = this.hi;
+  private final long initializeHi(long optimisticStamp) {
     if (hi == UNINITIALIZED) {
-      synchronized (mutex) {
-        hi = this.hi;
+      long exclusiveStamp = lock.writeLock();
+      try {
         if (hi == UNINITIALIZED) {
           hi = nextId();
-          this.hi = hi;
         }
+      } finally {
+        lock.unlockWrite(exclusiveStamp);
+        optimisticStamp = lock.tryOptimisticRead();
       }
     }
-    return hi;
+    return optimisticStamp;
   }
 }

@@ -14,23 +14,19 @@
  * limitations under the License.
  */
 
-package stincmale.idenator.evolution;
+package stincmale.idenator.variant;
 
 import stincmale.idenator.AbstractTwoPhaseLongIdGenerator;
 import stincmale.idenator.LongIdGenerator;
 import stincmale.idenator.doc.ThreadSafe;
 
-/**
- * A synchronized implementation of {@link AbstractTwoPhaseLongIdGenerator}.
- * {@link SynchronizedHiLoLongIdGenerator1} is consecutive if the supplied {@link LongIdGenerator} is consecutive.
- */
 @ThreadSafe
-public final class SynchronizedHiLoLongIdGenerator1 extends AbstractTwoPhaseLongIdGenerator {
+public final class SynchronizedTwoPhaseLongIdGenerator1 extends AbstractTwoPhaseLongIdGenerator {
   private final Object mutex;
   private long lo;
   private long hi;
 
-  public SynchronizedHiLoLongIdGenerator1(final LongIdGenerator hiGenerator, final long loUpperBoundOpen, final boolean pooled) {
+  public SynchronizedTwoPhaseLongIdGenerator1(final LongIdGenerator hiGenerator, final long loUpperBoundOpen, final boolean pooled) {
     super(hiGenerator, loUpperBoundOpen, pooled);
     mutex = new Object();
     lo = -1;
@@ -41,8 +37,10 @@ public final class SynchronizedHiLoLongIdGenerator1 extends AbstractTwoPhaseLong
   public final long next() {
     synchronized (mutex) {
       final long loUpperBoundOpen = getLoUpperBoundOpen();
-      if (++lo >= loUpperBoundOpen) {//lo is too big, we need to reset lo and advance hi
+      long lo = ++this.lo;//increment then get
+      if (lo >= loUpperBoundOpen) {//lo is too big, we need to reset lo and advance hi
         lo = 0;
+        this.lo = lo;
         hi = nextId();
       } else {//lo is fine
         hi = initializedHi();

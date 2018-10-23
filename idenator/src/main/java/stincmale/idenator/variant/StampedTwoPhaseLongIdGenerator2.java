@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package stincmale.idenator.evolution;
+package stincmale.idenator.variant;
 
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.StampedLock;
@@ -22,16 +22,13 @@ import stincmale.idenator.AbstractTwoPhaseLongIdGenerator;
 import stincmale.idenator.LongIdGenerator;
 import stincmale.idenator.doc.ThreadSafe;
 
-/**
- * A concurrent non-consecutive implementation of {@link AbstractTwoPhaseLongIdGenerator}.
- */
 @ThreadSafe
-public final class StampedLockHiLoLongIdGenerator1 extends AbstractTwoPhaseLongIdGenerator {
+public final class StampedTwoPhaseLongIdGenerator2 extends AbstractTwoPhaseLongIdGenerator {
   private final StampedLock lock;
   private final AtomicLong lo;
   private long hi;
 
-  public StampedLockHiLoLongIdGenerator1(final LongIdGenerator hiGenerator, final long loUpperBoundOpen, final boolean pooled) {
+  public StampedTwoPhaseLongIdGenerator2(final LongIdGenerator hiGenerator, final long loUpperBoundOpen, final boolean pooled) {
     super(hiGenerator, loUpperBoundOpen, pooled);
     lock = new StampedLock();
     lo = new AtomicLong(-1);
@@ -41,16 +38,24 @@ public final class StampedLockHiLoLongIdGenerator1 extends AbstractTwoPhaseLongI
   @Override
   public final long next() {
     final long loUpperBoundOpen = getLoUpperBoundOpen();
-    long hi;
-    long lo;
-    while (true) {
-      final long optimisticStamp = initializeHi(lock.tryOptimisticRead());
-      if (optimisticStamp == 0) {//failed to start optimistic read
-        continue;
+    long hi = UNINITIALIZED;
+    long lo = -1;
+    final int maxAttempts = 4;
+    for (int attemptIdx = 0; attemptIdx <= maxAttempts; attemptIdx++) {
+      final boolean optimisticAttempt = attemptIdx < maxAttempts;
+      final long optimisticStamp;
+      if (optimisticAttempt) {
+        optimisticStamp = initializeHi(lock.tryOptimisticRead());
+        if (optimisticStamp == 0) {//failed to start optimistic read
+          continue;
+        }
+        hi = this.hi;
+        lo = this.lo.incrementAndGet();
+      } else {
+        optimisticStamp = 0;
       }
-      hi = this.hi;
-      lo = this.lo.incrementAndGet();
-      if (lo >= loUpperBoundOpen) {//lo is too big, we probably need to reset lo and advance hi
+      if (lo >= loUpperBoundOpen ||//lo is too big, we probably need to reset lo and advance hi
+        !optimisticAttempt) {//no optimistic attempts left, it's time to use locking
         final long exclusiveStamp = lock.writeLock();
         try {
           lo = this.lo.incrementAndGet();
@@ -76,14 +81,11 @@ public final class StampedLockHiLoLongIdGenerator1 extends AbstractTwoPhaseLongI
   }
 
   private final long initializeHi(long optimisticStamp) {
-    long hi = this.hi;
     if (hi == UNINITIALIZED) {
       long exclusiveStamp = lock.writeLock();
       try {
-        hi = this.hi;
         if (hi == UNINITIALIZED) {
           hi = nextId();
-          this.hi = hi;
         }
       } finally {
         lock.unlockWrite(exclusiveStamp);

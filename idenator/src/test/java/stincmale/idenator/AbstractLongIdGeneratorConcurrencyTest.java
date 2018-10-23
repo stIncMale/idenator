@@ -28,7 +28,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static stincmale.idenator.internal.util.Utils.format;
 
-//TODO create tests with https://github.com/Devexperts/lin-check
 public abstract class AbstractLongIdGeneratorConcurrencyTest extends AbstractLongIdGeneratorTest {
   private final int numberOfThreads;
   private ExecutorService ex;

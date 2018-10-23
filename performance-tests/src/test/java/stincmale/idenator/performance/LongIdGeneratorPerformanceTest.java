@@ -16,6 +16,7 @@
 
 package stincmale.idenator.performance;
 
+import static java.time.Duration.ofMillis;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -31,10 +32,17 @@ import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import stincmale.idenator.LongIdGenerator;
 import stincmale.idenator.auxiliary.EphemeralStrictlyIncreasingHiGenerator;
+import stincmale.idenator.auxiliary.GaussianSleeper;
 import stincmale.idenator.auxiliary.NoopSleeper;
-import stincmale.idenator.evolution.SynchronizedHiLoLongIdGenerator1;
 import stincmale.idenator.performance.util.JmhOptions;
 import stincmale.idenator.performance.util.TestTag;
+import stincmale.idenator.variant.OptimisticTwoPhaseLongIdGenerator1;
+import stincmale.idenator.variant.OptimisticTwoPhaseLongIdGenerator2;
+import stincmale.idenator.variant.OptimisticTwoPhaseLongIdGenerator3;
+import stincmale.idenator.variant.StampedTwoPhaseLongIdGenerator1;
+import stincmale.idenator.variant.StampedTwoPhaseLongIdGenerator2;
+import stincmale.idenator.variant.SynchronizedTwoPhaseLongIdGenerator1;
+import stincmale.idenator.variant.SynchronizedTwoPhaseLongIdGenerator2;
 
 @Tag(TestTag.PERFORMANCE)
 @TestInstance(Lifecycle.PER_CLASS)
@@ -82,12 +90,184 @@ public class LongIdGeneratorPerformanceTest {
     return state.var2SmallLo.next();
   }
 
+  @Benchmark
+  public final long synchronized1NoLo(final BenchmarkState state) {
+    return state.synchronized1NoLo.next();
+  }
+
+  @Benchmark
+  public final long synchronized1SmallLo(final BenchmarkState state) {
+    return state.synchronized1SmallLo.next();
+  }
+
+  @Benchmark
+  public final long synchronized1BigLo(final BenchmarkState state) {
+    return state.synchronized1BigLo.next();
+  }
+
+  @Benchmark
+  public final long synchronized2NoLo(final BenchmarkState state) {
+    return state.synchronized2NoLo.next();
+  }
+
+  @Benchmark
+  public final long synchronized2SmallLo(final BenchmarkState state) {
+    return state.synchronized2SmallLo.next();
+  }
+
+  @Benchmark
+  public final long synchronized2BigLo(final BenchmarkState state) {
+    return state.synchronized2BigLo.next();
+  }
+
+  @Benchmark
+  public final long synchronized2SmallLoSleep(final BenchmarkState state) {
+    return state.synchronized2SmallLoSleep.next();
+  }
+
+  @Benchmark
+  public final long synchronized2BigLoSleep(final BenchmarkState state) {
+    return state.synchronized2BigLoSleep.next();
+  }
+
+  @Benchmark
+  public final long stamped1NoLo(final BenchmarkState state) {
+    return state.stamped1NoLo.next();
+  }
+
+  @Benchmark
+  public final long stamped1SmallLo(final BenchmarkState state) {
+    return state.stamped1SmallLo.next();
+  }
+
+  @Benchmark
+  public final long stamped1BigLo(final BenchmarkState state) {
+    return state.stamped1BigLo.next();
+  }
+
+  @Benchmark
+  public final long stamped2NoLo(final BenchmarkState state) {
+    return state.stamped2NoLo.next();
+  }
+
+  @Benchmark
+  public final long stamped2SmallLo(final BenchmarkState state) {
+    return state.stamped2SmallLo.next();
+  }
+
+  @Benchmark
+  public final long stamped2BigLo(final BenchmarkState state) {
+    return state.stamped2BigLo.next();
+  }
+
+  @Benchmark
+  public final long stamped2SmallLoSleep(final BenchmarkState state) {
+    return state.stamped2SmallLoSleep.next();
+  }
+
+  @Benchmark
+  public final long stamped2BigLoSleep(final BenchmarkState state) {
+    return state.stamped2BigLoSleep.next();
+  }
+
+  @Benchmark
+  public final long optimistic1NoLo(final BenchmarkState state) {
+    return state.optimistic1NoLo.next();
+  }
+
+  @Benchmark
+  public final long optimistic1SmallLo(final BenchmarkState state) {
+    return state.optimistic1SmallLo.next();
+  }
+
+  @Benchmark
+  public final long optimistic1BigLo(final BenchmarkState state) {
+    return state.optimistic1BigLo.next();
+  }
+
+  @Benchmark
+  public final long optimistic2NoLo(final BenchmarkState state) {
+    return state.optimistic2NoLo.next();
+  }
+
+  @Benchmark
+  public final long optimistic2SmallLo(final BenchmarkState state) {
+    return state.optimistic2SmallLo.next();
+  }
+
+  @Benchmark
+  public final long optimistic2BigLo(final BenchmarkState state) {
+    return state.optimistic2BigLo.next();
+  }
+
+  @Benchmark
+  public final long optimistic3NoLo(final BenchmarkState state) {
+    return state.optimistic3NoLo.next();
+  }
+
+  @Benchmark
+  public final long optimistic3SmallLo(final BenchmarkState state) {
+    return state.optimistic3SmallLo.next();
+  }
+
+  @Benchmark
+  public final long optimistic3BigLo(final BenchmarkState state) {
+    return state.optimistic3BigLo.next();
+  }
+
+  @Benchmark
+  public final long optimistic3SmallLoSleep(final BenchmarkState state) {
+    return state.optimistic3SmallLoSleep.next();
+  }
+
+  @Benchmark
+  public final long optimistic3BigLoSleep(final BenchmarkState state) {
+    return state.optimistic3BigLoSleep.next();
+  }
+
   @State(Scope.Benchmark)
   public static class BenchmarkState {
     private LongIdGenerator var1NoLo;
     private LongIdGenerator var1SmallLo;
     private LongIdGenerator var2NoLo;
     private LongIdGenerator var2SmallLo;
+
+    private LongIdGenerator synchronized1NoLo;
+    private LongIdGenerator synchronized1SmallLo;
+    private LongIdGenerator synchronized1BigLo;
+
+    private LongIdGenerator synchronized2NoLo;
+    private LongIdGenerator synchronized2SmallLo;
+    private LongIdGenerator synchronized2BigLo;
+
+    private LongIdGenerator synchronized2SmallLoSleep;
+    private LongIdGenerator synchronized2BigLoSleep;
+
+    private LongIdGenerator stamped1NoLo;
+    private LongIdGenerator stamped1SmallLo;
+    private LongIdGenerator stamped1BigLo;
+
+    private LongIdGenerator stamped2NoLo;
+    private LongIdGenerator stamped2SmallLo;
+    private LongIdGenerator stamped2BigLo;
+
+    private LongIdGenerator stamped2SmallLoSleep;
+    private LongIdGenerator stamped2BigLoSleep;
+
+    private LongIdGenerator optimistic1NoLo;
+    private LongIdGenerator optimistic1SmallLo;
+    private LongIdGenerator optimistic1BigLo;
+
+    private LongIdGenerator optimistic2NoLo;
+    private LongIdGenerator optimistic2SmallLo;
+    private LongIdGenerator optimistic2BigLo;
+
+    private LongIdGenerator optimistic3NoLo;
+    private LongIdGenerator optimistic3SmallLo;
+    private LongIdGenerator optimistic3BigLo;
+
+    private LongIdGenerator optimistic3SmallLoSleep;
+    private LongIdGenerator optimistic3BigLoSleep;
 
     public BenchmarkState() {
     }
@@ -97,14 +277,58 @@ public class LongIdGeneratorPerformanceTest {
       final long noLo = 1;
       final long smallLo = 10_000;
       final long bigLo = 1000_000;
-      var1NoLo = new SynchronizedHiLoLongIdGenerator1(
-        new EphemeralStrictlyIncreasingHiGenerator(0, noLo - 1, NoopSleeper.instance()), noLo, true);
-      var1SmallLo = new SynchronizedHiLoLongIdGenerator1(
-        new EphemeralStrictlyIncreasingHiGenerator(0, smallLo - 1, NoopSleeper.instance()), smallLo, true);
-      var2NoLo = new SynchronizedHiLoLongIdGenerator1(
-        new EphemeralStrictlyIncreasingHiGenerator(0, noLo - 1, NoopSleeper.instance()), noLo, true);
-      var2SmallLo = new SynchronizedHiLoLongIdGenerator1(
-        new EphemeralStrictlyIncreasingHiGenerator(0, smallLo - 1, NoopSleeper.instance()), smallLo, true);
+      var1NoLo = createIdGen(SynchronizedTwoPhaseLongIdGenerator1::new, noLo, false);
+      var1SmallLo = createIdGen(SynchronizedTwoPhaseLongIdGenerator1::new, smallLo, false);
+      var2NoLo = createIdGen(SynchronizedTwoPhaseLongIdGenerator2::new, noLo, false);
+      var2SmallLo = createIdGen(SynchronizedTwoPhaseLongIdGenerator2::new, smallLo, false);
+
+      synchronized1NoLo = createIdGen(SynchronizedTwoPhaseLongIdGenerator1::new, noLo, false);
+      synchronized1SmallLo = createIdGen(SynchronizedTwoPhaseLongIdGenerator1::new, smallLo, false);
+      synchronized1BigLo = createIdGen(SynchronizedTwoPhaseLongIdGenerator1::new, bigLo, false);
+
+      synchronized2NoLo = createIdGen(SynchronizedTwoPhaseLongIdGenerator2::new, noLo, false);
+      synchronized2SmallLo = createIdGen(SynchronizedTwoPhaseLongIdGenerator2::new, smallLo, false);
+      synchronized2BigLo = createIdGen(SynchronizedTwoPhaseLongIdGenerator2::new, bigLo, false);
+
+      synchronized2SmallLoSleep = createIdGen(SynchronizedTwoPhaseLongIdGenerator2::new, smallLo, true);
+      synchronized2BigLoSleep = createIdGen(SynchronizedTwoPhaseLongIdGenerator2::new, bigLo, true);
+
+      stamped1NoLo = createIdGen(StampedTwoPhaseLongIdGenerator1::new, noLo, false);
+      stamped1SmallLo = createIdGen(StampedTwoPhaseLongIdGenerator1::new, smallLo, false);
+      stamped1BigLo = createIdGen(StampedTwoPhaseLongIdGenerator1::new, bigLo, false);
+
+      stamped2NoLo = createIdGen(StampedTwoPhaseLongIdGenerator2::new, noLo, false);
+      stamped2SmallLo = createIdGen(StampedTwoPhaseLongIdGenerator2::new, smallLo, false);
+      stamped2BigLo = createIdGen(StampedTwoPhaseLongIdGenerator2::new, bigLo, false);
+
+      stamped2SmallLoSleep = createIdGen(StampedTwoPhaseLongIdGenerator2::new, smallLo, true);
+      stamped2BigLoSleep = createIdGen(StampedTwoPhaseLongIdGenerator2::new, bigLo, true);
+
+      optimistic1NoLo = createIdGen(OptimisticTwoPhaseLongIdGenerator1::new, noLo, false);
+      optimistic1SmallLo = createIdGen(OptimisticTwoPhaseLongIdGenerator1::new, smallLo, false);
+      optimistic1BigLo = createIdGen(OptimisticTwoPhaseLongIdGenerator1::new, bigLo, false);
+
+      optimistic2NoLo = createIdGen(OptimisticTwoPhaseLongIdGenerator2::new, noLo, false);
+      optimistic2SmallLo = createIdGen(OptimisticTwoPhaseLongIdGenerator2::new, smallLo, false);
+      optimistic2BigLo = createIdGen(OptimisticTwoPhaseLongIdGenerator2::new, bigLo, false);
+
+      optimistic3NoLo = createIdGen(OptimisticTwoPhaseLongIdGenerator3::new, noLo, false);
+      optimistic3SmallLo = createIdGen(OptimisticTwoPhaseLongIdGenerator3::new, smallLo, false);
+      optimistic3BigLo = createIdGen(OptimisticTwoPhaseLongIdGenerator3::new, bigLo, false);
+
+      optimistic3SmallLoSleep = createIdGen(OptimisticTwoPhaseLongIdGenerator3::new, smallLo, true);
+      optimistic3BigLoSleep = createIdGen(OptimisticTwoPhaseLongIdGenerator3::new, bigLo, true);
     }
+  }
+
+  private static final LongIdGenerator createIdGen(final LongIdGeneratorCreator creator, final long loUpperBoundOpen, boolean sleep) {
+    return creator.create(
+      new EphemeralStrictlyIncreasingHiGenerator(0, loUpperBoundOpen - 1,
+        sleep ? new GaussianSleeper(ofMillis(8), ofMillis(2)) : NoopSleeper.instance()),
+      loUpperBoundOpen, true);
+  }
+
+  private interface LongIdGeneratorCreator {
+    LongIdGenerator create(LongIdGenerator hiGenerator, long loUpperBoundOpen, boolean pooled);
   }
 }

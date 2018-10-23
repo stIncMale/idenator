@@ -38,7 +38,7 @@ public abstract class AbstractLongIdGeneratorTest {
   }
 
   protected interface LongIdGeneratorCreator {
-    AbstractTwoPhaseLongIdGenerator create(final LongIdGenerator hiGenerator, final long loUpperBoundOpen, final boolean pooled);
+    AbstractTwoPhaseLongIdGenerator create(LongIdGenerator hiGenerator, long loUpperBoundOpen, boolean pooled);
   }
 
   protected static final class LongIdGeneratorCreatorAndParams implements Supplier<AbstractTwoPhaseLongIdGenerator> {

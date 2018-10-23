@@ -13,22 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package stincmale.idenator;
+
+package stincmale.idenator.variant;
 
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.StampedLock;
+import stincmale.idenator.AbstractTwoPhaseLongIdGenerator;
+import stincmale.idenator.LongIdGenerator;
 import stincmale.idenator.doc.ThreadSafe;
 
-/**
- * A {@linkplain ThreadSafe thread-safe} implementation of {@link AbstractTwoPhaseLongIdGenerator}.
- */
 @ThreadSafe
-public final class ConcurrentTwoPhaseLongIdGenerator extends AbstractTwoPhaseLongIdGenerator {
+public final class OptimisticTwoPhaseLongIdGenerator2 extends AbstractTwoPhaseLongIdGenerator {
   private final StampedLock lock;
   private final AtomicLong lo;
   private volatile long hi;
 
-  public ConcurrentTwoPhaseLongIdGenerator(final LongIdGenerator hiGenerator, final long loUpperBoundOpen, final boolean pooled) {
+  public OptimisticTwoPhaseLongIdGenerator2(final LongIdGenerator hiGenerator, final long loUpperBoundOpen, final boolean pooled) {
     super(hiGenerator, loUpperBoundOpen, pooled);
     lock = new StampedLock();
     lo = new AtomicLong(-1);
@@ -38,17 +38,12 @@ public final class ConcurrentTwoPhaseLongIdGenerator extends AbstractTwoPhaseLon
   @Override
   public final long next() {
     final long loUpperBoundOpen = getLoUpperBoundOpen();
-    long hi = UNINITIALIZED;
-    long lo = -1;
-    final int maxAttempts = 4;
-    for (int attemptIdx = 0; attemptIdx <= maxAttempts; attemptIdx++) {
-      final boolean optimisticAttempt = attemptIdx < maxAttempts;
-      if (optimisticAttempt) {
-        hi = initializedHi();
-        lo = this.lo.incrementAndGet();
-      }
-      if (lo >= loUpperBoundOpen ||//lo is too big, we probably need to reset lo and advance hi
-        !optimisticAttempt) {//no optimistic attempts left, it's time to use locking
+    long hi;
+    long lo;
+    while (true) {//each iteration starts with an optimistic read attempt
+      hi = initializedHi();
+      lo = this.lo.incrementAndGet();
+      if (lo >= loUpperBoundOpen) {//lo is too big, we probably need to reset lo and advance hi
         final long exclusiveStamp = lock.writeLock();
         try {
           lo = this.lo.incrementAndGet();

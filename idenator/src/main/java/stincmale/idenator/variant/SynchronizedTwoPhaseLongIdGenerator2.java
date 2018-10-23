@@ -14,23 +14,19 @@
  * limitations under the License.
  */
 
-package stincmale.idenator.evolution;
+package stincmale.idenator.variant;
 
 import stincmale.idenator.AbstractTwoPhaseLongIdGenerator;
 import stincmale.idenator.LongIdGenerator;
 import stincmale.idenator.doc.ThreadSafe;
 
-/**
- * A synchronized implementation of {@link AbstractTwoPhaseLongIdGenerator}.
- * {@link SynchronizedHiLoLongIdGenerator2} is consecutive if the supplied {@link LongIdGenerator} is consecutive.
- */
 @ThreadSafe
-public final class SynchronizedHiLoLongIdGenerator2 extends AbstractTwoPhaseLongIdGenerator {
+public final class SynchronizedTwoPhaseLongIdGenerator2 extends AbstractTwoPhaseLongIdGenerator {
   private final Object mutex;
   private long lo;
   private long hi;
 
-  public SynchronizedHiLoLongIdGenerator2(final LongIdGenerator hiGenerator, final long loUpperBoundOpen, final boolean pooled) {
+  public SynchronizedTwoPhaseLongIdGenerator2(final LongIdGenerator hiGenerator, final long loUpperBoundOpen, final boolean pooled) {
     super(hiGenerator, loUpperBoundOpen, pooled);
     mutex = new Object();
     lo = -1;

@@ -16,6 +16,8 @@
 
 package stincmale.idenator.performance.util;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import static org.openjdk.jmh.runner.options.TimeValue.milliseconds;
 import stincmale.idenator.doc.NotThreadSafe;
@@ -23,7 +25,7 @@ import stincmale.idenator.doc.NotThreadSafe;
 @NotThreadSafe
 public final class JmhOptions {
   private static final boolean JAVA_SERVER = true;
-  private static final boolean JAVA_ASSERTIONS = false;
+  private static final boolean JAVA_ENABLE_ASSERTIONS = false;
   private static final boolean JAVA_DISABLE_BIASED_LOCKING = false;
   private static final boolean JAVA_DISABLE_GC = true;
 
@@ -39,25 +41,37 @@ public final class JmhOptions {
 
   public static final OptionsBuilder get() {
     final OptionsBuilder result = new OptionsBuilder();
-    result.jvmArgs("-Xms2096m", "-Xmx2096m")
-      .jvmArgsAppend(
-        JAVA_SERVER ? "-server" : "-client",
-        JAVA_ASSERTIONS ? "-enableassertions" : "-disableassertions")
+    final Collection<String> jvmArgs = new ArrayList<>();
+    jvmArgs.add("-Xfuture");
+    jvmArgs.add("-Xms2096m");
+    jvmArgs.add("-Xmx2096m");
+    if (JAVA_SERVER) {
+      jvmArgs.add("-server");
+    } else {
+      jvmArgs.add("-client");
+    }
+    if (JAVA_ENABLE_ASSERTIONS) {
+      jvmArgs.add("-enableassertions");
+    } else {
+      jvmArgs.add("-disableassertions");
+    }
+    if (JAVA_DISABLE_BIASED_LOCKING) {
+      jvmArgs.add("-XX:-UseBiasedLocking");
+    }
+    if (JAVA_DISABLE_GC) {
+      jvmArgs.add("-XX:+UnlockExperimentalVMOptions");
+      jvmArgs.add("-XX:+UseEpsilonGC");
+    }
+    result.jvmArgs(jvmArgs.toArray(new String[jvmArgs.size()]))
       .shouldDoGC(false)
       .syncIterations(true)
       .shouldFailOnError(true)
       .threads(1)
       .timeout(milliseconds(5_000));
-    if (JAVA_DISABLE_BIASED_LOCKING) {
-      result.jvmArgsAppend("-XX:-UseBiasedLocking");
-    }
-    if (JAVA_DISABLE_GC) {
-      result.jvmArgsAppend("-XX:+UnlockExperimentalVMOptions", "-XX:+UseEpsilonGC");
-    }
-    result.forks(3)
+    result.forks(20)
       .warmupTime(milliseconds(200))
       .warmupIterations(10)
-      .measurementTime(milliseconds(200))
+      .measurementTime(milliseconds(300))
       .measurementIterations(10);
     return result;
   }

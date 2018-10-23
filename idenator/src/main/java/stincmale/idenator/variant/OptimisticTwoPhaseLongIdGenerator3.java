@@ -14,25 +14,23 @@
  * limitations under the License.
  */
 
-package stincmale.idenator.evolution;
+package stincmale.idenator.variant;
 
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.StampedLock;
 import stincmale.idenator.AbstractTwoPhaseLongIdGenerator;
 import stincmale.idenator.LongIdGenerator;
 import stincmale.idenator.doc.ThreadSafe;
 
-/**
- * A concurrent non-consecutive implementation of {@link AbstractTwoPhaseLongIdGenerator}.
- */
 @ThreadSafe
-public final class OptimisticHiLoLongIdGenerator1 extends AbstractTwoPhaseLongIdGenerator {
-  private final Object mutex;
+public final class OptimisticTwoPhaseLongIdGenerator3 extends AbstractTwoPhaseLongIdGenerator {
+  private final StampedLock lock;
   private final AtomicLong lo;
   private volatile long hi;
 
-  public OptimisticHiLoLongIdGenerator1(final LongIdGenerator hiGenerator, final long loUpperBoundOpen, final boolean pooled) {
+  public OptimisticTwoPhaseLongIdGenerator3(final LongIdGenerator hiGenerator, final long loUpperBoundOpen, final boolean pooled) {
     super(hiGenerator, loUpperBoundOpen, pooled);
-    mutex = new Object();
+    lock = new StampedLock();
     lo = new AtomicLong(-1);
     hi = UNINITIALIZED;
   }
@@ -40,13 +38,19 @@ public final class OptimisticHiLoLongIdGenerator1 extends AbstractTwoPhaseLongId
   @Override
   public final long next() {
     final long loUpperBoundOpen = getLoUpperBoundOpen();
-    long hi;
-    long lo;
-    while (true) {//each iteration starts with an optimistic read attempt
-      hi = initializedHi();
-      lo = this.lo.incrementAndGet();
-      if (lo >= loUpperBoundOpen) {//lo is too big, we probably need to reset lo and advance hi
-        synchronized (mutex) {
+    long hi = UNINITIALIZED;
+    long lo = -1;
+    final int maxAttempts = 4;
+    for (int attemptIdx = 0; attemptIdx <= maxAttempts; attemptIdx++) {
+      final boolean optimisticAttempt = attemptIdx < maxAttempts;
+      if (optimisticAttempt) {
+        hi = initializedHi();
+        lo = this.lo.incrementAndGet();
+      }
+      if (lo >= loUpperBoundOpen ||//lo is too big, we probably need to reset lo and advance hi
+        !optimisticAttempt) {//no optimistic attempts left, it's time to use locking
+        final long exclusiveStamp = lock.writeLock();
+        try {
           lo = this.lo.incrementAndGet();
           if (lo >= loUpperBoundOpen) {//re-check whether we still need to reset lo and advance hi
             hi = nextId();
@@ -57,6 +61,8 @@ public final class OptimisticHiLoLongIdGenerator1 extends AbstractTwoPhaseLongId
             hi = this.hi;
           }
           break;//hi+lo read was atomic because it was made under the exclusive lock
+        } finally {
+          lock.unlockWrite(exclusiveStamp);
         }
       } else {//lo is fine, check whether optimistic read succeeded
         if (this.hi == hi) {//optimistic read succeeded, hence read hi+lo was atomic and we can break the loop
@@ -70,12 +76,15 @@ public final class OptimisticHiLoLongIdGenerator1 extends AbstractTwoPhaseLongId
   private final long initializedHi() {
     long hi = this.hi;
     if (hi == UNINITIALIZED) {
-      synchronized (mutex) {
+      final long exclusiveStamp = lock.writeLock();
+      try {
         hi = this.hi;
         if (hi == UNINITIALIZED) {
           hi = nextId();
           this.hi = hi;
         }
+      } finally {
+        lock.unlockWrite(exclusiveStamp);
       }
     }
     return hi;

@@ -64,7 +64,6 @@
               -Xfuture
               -Xmx1024m
               --add-opens stincmale.idenator/stincmale.idenator=ALL-UNNAMED
-              --add-opens stincmale.idenator/stincmale.idenator.auxiliary=ALL-UNNAMED
               --add-opens stincmale.idenator/stincmale.idenator.internal=ALL-UNNAMED
               --add-opens stincmale.idenator/stincmale.idenator.internal.variant=ALL-UNNAMED
             </argLine>

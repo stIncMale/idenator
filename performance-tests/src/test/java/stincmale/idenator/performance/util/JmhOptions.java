@@ -43,6 +43,7 @@ public final class JmhOptions {
     final OptionsBuilder result = new OptionsBuilder();
     final Collection<String> jvmArgs = new ArrayList<>();
     jvmArgs.add("-Xfuture");
+    jvmArgs.add("-Xshare:off");
     jvmArgs.add("-Xms2096m");
     jvmArgs.add("-Xmx2096m");
     if (JAVA_SERVER) {

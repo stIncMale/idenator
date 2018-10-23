@@ -61,6 +61,11 @@ public class LongIdGeneratorPerformanceTest {
   }
 
   @Test
+  public final void throughputThreads1() throws RunnerException {
+    runThroughputBenchmarks(1);
+  }
+
+  @Test
   public final void throughputThreads4() throws RunnerException {
     runThroughputBenchmarks(4);
   }
@@ -68,26 +73,6 @@ public class LongIdGeneratorPerformanceTest {
   @Test
   public final void throughputThreads32() throws RunnerException {
     runThroughputBenchmarks(32);
-  }
-
-  @Benchmark
-  public final long var1NoLo(final BenchmarkState state) {
-    return state.var1NoLo.next();
-  }
-
-  @Benchmark
-  public final long var1SmallLo(final BenchmarkState state) {
-    return state.var1SmallLo.next();
-  }
-
-  @Benchmark
-  public final long var2NoLo(final BenchmarkState state) {
-    return state.var2NoLo.next();
-  }
-
-  @Benchmark
-  public final long var2SmallLo(final BenchmarkState state) {
-    return state.var2SmallLo.next();
   }
 
   @Benchmark
@@ -227,11 +212,6 @@ public class LongIdGeneratorPerformanceTest {
 
   @State(Scope.Benchmark)
   public static class BenchmarkState {
-    private LongIdGenerator var1NoLo;
-    private LongIdGenerator var1SmallLo;
-    private LongIdGenerator var2NoLo;
-    private LongIdGenerator var2SmallLo;
-
     private LongIdGenerator synchronized1NoLo;
     private LongIdGenerator synchronized1SmallLo;
     private LongIdGenerator synchronized1BigLo;
@@ -277,11 +257,6 @@ public class LongIdGeneratorPerformanceTest {
       final long noLo = 1;
       final long smallLo = 10_000;
       final long bigLo = 1000_000;
-      var1NoLo = createIdGen(SynchronizedTwoPhaseLongIdGenerator1::new, noLo, false);
-      var1SmallLo = createIdGen(SynchronizedTwoPhaseLongIdGenerator1::new, smallLo, false);
-      var2NoLo = createIdGen(SynchronizedTwoPhaseLongIdGenerator2::new, noLo, false);
-      var2SmallLo = createIdGen(SynchronizedTwoPhaseLongIdGenerator2::new, smallLo, false);
-
       synchronized1NoLo = createIdGen(SynchronizedTwoPhaseLongIdGenerator1::new, noLo, false);
       synchronized1SmallLo = createIdGen(SynchronizedTwoPhaseLongIdGenerator1::new, smallLo, false);
       synchronized1BigLo = createIdGen(SynchronizedTwoPhaseLongIdGenerator1::new, bigLo, false);

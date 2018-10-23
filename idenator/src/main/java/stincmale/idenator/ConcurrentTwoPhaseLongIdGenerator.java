@@ -28,6 +28,11 @@ public final class ConcurrentTwoPhaseLongIdGenerator extends AbstractTwoPhaseLon
   private final AtomicLong lo;
   private volatile long hi;
 
+  /**
+   * @param hiGenerator See {@link AbstractTwoPhaseLongIdGenerator#AbstractTwoPhaseLongIdGenerator(LongIdGenerator, long, boolean)}.
+   * @param loUpperBoundOpen See {@link AbstractTwoPhaseLongIdGenerator#AbstractTwoPhaseLongIdGenerator(LongIdGenerator, long, boolean)}.
+   * @param pooled See {@link AbstractTwoPhaseLongIdGenerator#AbstractTwoPhaseLongIdGenerator(LongIdGenerator, long, boolean)}.
+   */
   public ConcurrentTwoPhaseLongIdGenerator(final LongIdGenerator hiGenerator, final long loUpperBoundOpen, final boolean pooled) {
     super(hiGenerator, loUpperBoundOpen, pooled);
     lock = new StampedLock();

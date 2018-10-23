@@ -23,7 +23,7 @@ import static stincmale.idenator.internal.util.Utils.format;
 
 /**
  * This ID generator can be represented as an optimization around another ID generator (specifically {@linkplain #getHiGenerator() hiGenerator}),
- * which require noticeable amount of resources (usually time) to produce a new identifier
+ * which requires noticeable amount of resources (usually time) to produce a new identifier
  * (e.g. because it requires accessing a persistent storage to generate a new identifier).
  * <p>
  * This ID generator maintains two values: {@code hi} and {@code lo},

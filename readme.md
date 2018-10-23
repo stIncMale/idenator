@@ -8,7 +8,7 @@
 ## About
 An [open source](https://opensource.org/osd) Java library that supplies tools for generating identifiers.
 
-All you need to get started is to read how it works [here](https://stincmale.github.io/idenator/apidocs/current/stincmale.idenator/stincmale/idenator/AbstractTwoPhaseLongIdGenerator.html), and then wrap your database sequence ID generator into [`ConcurrentTwoPhaseLongIdGenerator`](https://stincmale.github.io/idenator/apidocs/current/stincmale.idenator/stincmale/idenator/ConcurrentTwoPhaseLongIdGenerator.html) and get a high-performance persistent ID generator.
+All you need to get started is to read how it works [here](https://stincmale.github.io/idenator/apidocs/current/stincmale.idenator/stincmale/idenator/AbstractTwoPhaseLongIdGenerator.html), and then wrap your database sequence ID generator into [`ConcurrentTwoPhaseLongIdGenerator`](https://stincmale.github.io/idenator/apidocs/current/stincmale.idenator/stincmale/idenator/ConcurrentTwoPhaseLongIdGenerator.html) and get a [high-performance](https://github.com/stIncMale/idenator/wiki/Performance) persistent ID generator.
 
 ## Versioning
 This project uses [semantic versioning](https://semver.org). The current version is `0.1.0-SNAPSHOT`.

@@ -23,8 +23,8 @@ import static stincmale.idenator.internal.util.Utils.format;
 
 /**
  * This ID generator can be represented as an optimization around another ID generator (specifically {@linkplain #getHiGenerator() hiGenerator}),
- * which requires noticeable amount of resources (usually time) to produce a new identifier
- * (e.g. because it requires accessing a persistent storage to generate a new identifier).
+ * which requires noticeable amount of resources (usually time) to produce a new identifier.
+ * For example, {@linkplain #getHiGenerator() hiGenerator} may need to access a persistent storage to generate a new identifier.
  * <p>
  * This ID generator maintains two values: {@code hi} and {@code lo},
  * and uses them for {@linkplain #calculateId(long, long) calculation} of a new identifier.
@@ -65,6 +65,7 @@ import static stincmale.idenator.internal.util.Utils.format;
  * otherwise this ID generator is nonmonotonic.
  * </li>
  * </ul>
+ * <p>
  * This class is {@linkplain ThreadSafe thread-safe}, but does not impose this restriction on its subclasses.
  */
 @ThreadSafe
@@ -88,16 +89,16 @@ public abstract class AbstractTwoPhaseLongIdGenerator implements LongIdGenerator
    * If persistent behaviour (see {@link stincmale.idenator}) is required,
    * then this parameter should be the same for different executions of the program.
    * Using different values in different executions can sometimes be possible, but this is beyond of scope of this documentation.
+   * <p>
+   * If {@code pooled} is specified as true,
+   * then this argument must have a value from the interval [0; {@code (sparseness + 1)}] (see {@link stincmale.idenator}).
+   * The recommended value is {@code (sparseness + 1)} because it minimizes the frequency of accesses to {@code hiGenerator}.
    * @param pooled Defines whether this ID generator will work in Hi/Lo or in pooled (recommended) mode
-   * (this affects behaviour of {@link #calculateId(long, long)}).
+   * (this affects the behaviour of {@link #calculateId(long, long)}).
    * <p>
    * If {@code hiGenerator} is sparse (see {@link stincmale.idenator}),
    * then specify true and specify {@code (sparseness + 1)} as {@code loUpperBoundOpen}.
    * Otherwise, or if you don't know anything about the behaviour of {@code hiGenerator}, specify false.
-   * <p>
-   * For the sake of testing, specifying {@code pooled} true and {@code loUpperBoundOpen} 1 is allowed,
-   * despite it means that {@code sparseness} is 0, which is not allowed by the definition of sparseness.
-   * But we may think that an ID generator with 0 sparseness is a degenerate case of a sparse ID generator.
    */
   protected AbstractTwoPhaseLongIdGenerator(final LongIdGenerator hiGenerator, final long loUpperBoundOpen, final boolean pooled) {
     checkArgument(loUpperBoundOpen > 0, "loUpperBoundOpen", "Must be positive");
@@ -134,7 +135,7 @@ public abstract class AbstractTwoPhaseLongIdGenerator implements LongIdGenerator
 
   /**
    * @return The next {@code hi} value by using {@link #getHiGenerator() hiGenerator}.
-   * Never return {@link AbstractTwoPhaseLongIdGenerator#UNINITIALIZED}.
+   * Never returns {@link AbstractTwoPhaseLongIdGenerator#UNINITIALIZED}.
    */
   protected final long nextId() {
     final long id = hiGenerator.next();

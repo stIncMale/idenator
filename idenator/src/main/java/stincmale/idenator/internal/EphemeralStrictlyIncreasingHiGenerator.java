@@ -62,8 +62,8 @@ public final class EphemeralStrictlyIncreasingHiGenerator implements LongIdGener
   @Override
   public final String toString() {
     return getClass().getSimpleName() +
-      "{sparseness=" + sparseness +
-      ", sleeper=" + sleeper +
-      '}';
+        "{sparseness=" + sparseness +
+        ", sleeper=" + sleeper +
+        '}';
   }
 }

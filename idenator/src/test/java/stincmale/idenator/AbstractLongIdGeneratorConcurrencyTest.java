@@ -38,9 +38,9 @@ public abstract class AbstractLongIdGeneratorConcurrencyTest extends AbstractLon
   }
 
   private static final void doTest(
-    final LongIdGeneratorCreatorAndParams idGenCreator,
-    final long[][] threadLocalIdHolders,
-    final ExecutorService ex) {
+      final LongIdGeneratorCreatorAndParams idGenCreator,
+      final long[][] threadLocalIdHolders,
+      final ExecutorService ex) {
     final AtomicReference<Long> firstDuplicateId = new AtomicReference<>();
     final AtomicReference<RuntimeException> firstException = new AtomicReference<>();
     final int numberOfThreads = threadLocalIdHolders.length;

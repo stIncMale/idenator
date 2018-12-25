@@ -53,7 +53,7 @@ public final class ConcurrentTwoPhaseLongIdGenerator extends AbstractTwoPhaseLon
         lo = this.lo.incrementAndGet();
       }
       if (lo >= loUpperBoundOpen ||//lo is too big, we probably need to reset lo and advance hi
-        !optimisticAttempt) {//no optimistic attempts left, it's time to use locking
+          !optimisticAttempt) {//no optimistic attempts left, it's time to use locking
         final long exclusiveStamp = lock.writeLock();
         try {
           lo = this.lo.incrementAndGet();

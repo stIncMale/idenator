@@ -121,8 +121,8 @@ public abstract class AbstractTwoPhaseLongIdGenerator implements LongIdGenerator
     checkArgument(lo >= 0, "lo", "Must not be negative");
     checkArgument(lo < loUpperBoundOpen, "lo", () -> format("Must be less than %s=%s", "loUpperBoundOpen", loUpperBoundOpen));
     return pooled
-      ? hi + lo
-      : hi * loUpperBoundOpen + lo;
+        ? hi + lo
+        : hi * loUpperBoundOpen + lo;
   }
 
   /**
@@ -158,9 +158,9 @@ public abstract class AbstractTwoPhaseLongIdGenerator implements LongIdGenerator
   @Override
   public String toString() {
     return getClass().getSimpleName() +
-      "{hiGenerator=" + hiGenerator +
-      ", loUpperBoundOpen=" + loUpperBoundOpen +
-      ", pooled=" + pooled +
-      '}';
+        "{hiGenerator=" + hiGenerator +
+        ", loUpperBoundOpen=" + loUpperBoundOpen +
+        ", pooled=" + pooled +
+        '}';
   }
 }

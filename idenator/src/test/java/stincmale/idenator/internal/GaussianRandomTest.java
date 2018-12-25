@@ -20,7 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import stincmale.idenator.internal.GaussianRandom;
 import stincmale.idenator.util.TestTag;
 
 @Tag(TestTag.UNIT)

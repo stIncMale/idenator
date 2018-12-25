@@ -20,6 +20,5 @@ public final class TestTag {
   public static final String PERFORMANCE = "performance";
 
   private TestTag() {
-    throw new UnsupportedOperationException("The class isn't designed to be instantiated");
   }
 }

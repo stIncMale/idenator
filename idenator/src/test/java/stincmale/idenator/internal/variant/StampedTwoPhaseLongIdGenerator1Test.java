@@ -28,17 +28,17 @@ import stincmale.idenator.util.TestTag;
 final class StampedTwoPhaseLongIdGenerator1Test extends AbstractLongIdGeneratorUnitTest {
   private StampedTwoPhaseLongIdGenerator1Test() {
     super(
-      new LongIdGeneratorCreatorAndParams(StampedTwoPhaseLongIdGenerator1::new, 0, 1, false),
-      new LongIdGeneratorCreatorAndParams(StampedTwoPhaseLongIdGenerator1::new, 0, 10, false),
-      new LongIdGeneratorCreatorAndParams(StampedTwoPhaseLongIdGenerator1::new, 0, 1, true),
-      new LongIdGeneratorCreatorAndParams(StampedTwoPhaseLongIdGenerator1::new, 0, 10, true),
-      new LongIdGeneratorCreatorAndParams(StampedTwoPhaseLongIdGenerator1::new, Long.MIN_VALUE + 1, 1, false),
-      new LongIdGeneratorCreatorAndParams(StampedTwoPhaseLongIdGenerator1::new, Long.MIN_VALUE + 1, 10, false),
-      new LongIdGeneratorCreatorAndParams(StampedTwoPhaseLongIdGenerator1::new, Long.MIN_VALUE + 1, 1, true),
-      new LongIdGeneratorCreatorAndParams(StampedTwoPhaseLongIdGenerator1::new, Long.MIN_VALUE + 1, 10, true),
-      new LongIdGeneratorCreatorAndParams(StampedTwoPhaseLongIdGenerator1::new, Long.MAX_VALUE, 1, false),
-      new LongIdGeneratorCreatorAndParams(StampedTwoPhaseLongIdGenerator1::new, Long.MAX_VALUE, 10, false),
-      new LongIdGeneratorCreatorAndParams(StampedTwoPhaseLongIdGenerator1::new, Long.MAX_VALUE, 1, true),
-      new LongIdGeneratorCreatorAndParams(StampedTwoPhaseLongIdGenerator1::new, Long.MAX_VALUE, 10, true));
+        new LongIdGeneratorCreatorAndParams(StampedTwoPhaseLongIdGenerator1::new, 0, 1, false),
+        new LongIdGeneratorCreatorAndParams(StampedTwoPhaseLongIdGenerator1::new, 0, 10, false),
+        new LongIdGeneratorCreatorAndParams(StampedTwoPhaseLongIdGenerator1::new, 0, 1, true),
+        new LongIdGeneratorCreatorAndParams(StampedTwoPhaseLongIdGenerator1::new, 0, 10, true),
+        new LongIdGeneratorCreatorAndParams(StampedTwoPhaseLongIdGenerator1::new, Long.MIN_VALUE + 1, 1, false),
+        new LongIdGeneratorCreatorAndParams(StampedTwoPhaseLongIdGenerator1::new, Long.MIN_VALUE + 1, 10, false),
+        new LongIdGeneratorCreatorAndParams(StampedTwoPhaseLongIdGenerator1::new, Long.MIN_VALUE + 1, 1, true),
+        new LongIdGeneratorCreatorAndParams(StampedTwoPhaseLongIdGenerator1::new, Long.MIN_VALUE + 1, 10, true),
+        new LongIdGeneratorCreatorAndParams(StampedTwoPhaseLongIdGenerator1::new, Long.MAX_VALUE, 1, false),
+        new LongIdGeneratorCreatorAndParams(StampedTwoPhaseLongIdGenerator1::new, Long.MAX_VALUE, 10, false),
+        new LongIdGeneratorCreatorAndParams(StampedTwoPhaseLongIdGenerator1::new, Long.MAX_VALUE, 1, true),
+        new LongIdGeneratorCreatorAndParams(StampedTwoPhaseLongIdGenerator1::new, Long.MAX_VALUE, 10, true));
   }
 }

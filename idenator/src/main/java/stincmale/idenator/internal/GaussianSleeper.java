@@ -41,7 +41,7 @@ public final class GaussianSleeper implements Sleeper {
     checkNotNull(absoluteDeviation, "absoluteDeviation");
     checkArgument(!absoluteDeviation.isNegative(), "absoluteDeviation", "Must not be negative");
     checkArgument(absoluteDeviation.compareTo(midrange) <= 0, "absoluteDeviation",
-      () -> format("%s=%s must be less than or equal to %s=%s", "absoluteDeviation", absoluteDeviation, "midrange", midrange));
+        () -> format("%s=%s must be less than or equal to %s=%s", "absoluteDeviation", absoluteDeviation, "midrange", midrange));
     rnd = new GaussianRandom(midrange.toMillis(), absoluteDeviation.toMillis());
   }
 
@@ -57,8 +57,8 @@ public final class GaussianSleeper implements Sleeper {
   @Override
   public final String toString() {
     return getClass().getSimpleName() +
-      "{midrangeMillis=" + rnd.getMidrange() +
-      ", absoluteDeviationMillis=" + rnd.getAbsoluteDeviation() +
-      '}';
+        "{midrangeMillis=" + rnd.getMidrange() +
+        ", absoluteDeviationMillis=" + rnd.getAbsoluteDeviation() +
+        '}';
   }
 }

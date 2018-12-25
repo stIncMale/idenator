@@ -20,7 +20,6 @@ import java.util.Locale;
 
 public final class Utils {
   private Utils() {
-    throw new UnsupportedOperationException("The class isn't designed to be instantiated");
   }
 
   public static final String format(final String format, final Object... args) {

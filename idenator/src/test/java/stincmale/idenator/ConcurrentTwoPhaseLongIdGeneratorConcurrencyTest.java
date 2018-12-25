@@ -25,17 +25,17 @@ import stincmale.idenator.util.TestTag;
 final class ConcurrentTwoPhaseLongIdGeneratorConcurrencyTest extends AbstractLongIdGeneratorConcurrencyTest {
   private ConcurrentTwoPhaseLongIdGeneratorConcurrencyTest() {
     super(2 * Math.max(2, Runtime.getRuntime().availableProcessors()),
-      new LongIdGeneratorCreatorAndParams(ConcurrentTwoPhaseLongIdGenerator::new, 0, 1, false),
-      new LongIdGeneratorCreatorAndParams(ConcurrentTwoPhaseLongIdGenerator::new, 0, 10, false),
-      new LongIdGeneratorCreatorAndParams(ConcurrentTwoPhaseLongIdGenerator::new, 0, 1, true),
-      new LongIdGeneratorCreatorAndParams(ConcurrentTwoPhaseLongIdGenerator::new, 0, 10, true),
-      new LongIdGeneratorCreatorAndParams(ConcurrentTwoPhaseLongIdGenerator::new, Long.MIN_VALUE + 1, 1, false),
-      new LongIdGeneratorCreatorAndParams(ConcurrentTwoPhaseLongIdGenerator::new, Long.MIN_VALUE + 1, 10, false),
-      new LongIdGeneratorCreatorAndParams(ConcurrentTwoPhaseLongIdGenerator::new, Long.MIN_VALUE + 1, 1, true),
-      new LongIdGeneratorCreatorAndParams(ConcurrentTwoPhaseLongIdGenerator::new, Long.MIN_VALUE + 1, 10, true),
-      new LongIdGeneratorCreatorAndParams(ConcurrentTwoPhaseLongIdGenerator::new, Long.MAX_VALUE, 1, false),
-      new LongIdGeneratorCreatorAndParams(ConcurrentTwoPhaseLongIdGenerator::new, Long.MAX_VALUE, 10, false),
-      new LongIdGeneratorCreatorAndParams(ConcurrentTwoPhaseLongIdGenerator::new, Long.MAX_VALUE, 1, true),
-      new LongIdGeneratorCreatorAndParams(ConcurrentTwoPhaseLongIdGenerator::new, Long.MAX_VALUE, 10, true));
+        new LongIdGeneratorCreatorAndParams(ConcurrentTwoPhaseLongIdGenerator::new, 0, 1, false),
+        new LongIdGeneratorCreatorAndParams(ConcurrentTwoPhaseLongIdGenerator::new, 0, 10, false),
+        new LongIdGeneratorCreatorAndParams(ConcurrentTwoPhaseLongIdGenerator::new, 0, 1, true),
+        new LongIdGeneratorCreatorAndParams(ConcurrentTwoPhaseLongIdGenerator::new, 0, 10, true),
+        new LongIdGeneratorCreatorAndParams(ConcurrentTwoPhaseLongIdGenerator::new, Long.MIN_VALUE + 1, 1, false),
+        new LongIdGeneratorCreatorAndParams(ConcurrentTwoPhaseLongIdGenerator::new, Long.MIN_VALUE + 1, 10, false),
+        new LongIdGeneratorCreatorAndParams(ConcurrentTwoPhaseLongIdGenerator::new, Long.MIN_VALUE + 1, 1, true),
+        new LongIdGeneratorCreatorAndParams(ConcurrentTwoPhaseLongIdGenerator::new, Long.MIN_VALUE + 1, 10, true),
+        new LongIdGeneratorCreatorAndParams(ConcurrentTwoPhaseLongIdGenerator::new, Long.MAX_VALUE, 1, false),
+        new LongIdGeneratorCreatorAndParams(ConcurrentTwoPhaseLongIdGenerator::new, Long.MAX_VALUE, 10, false),
+        new LongIdGeneratorCreatorAndParams(ConcurrentTwoPhaseLongIdGenerator::new, Long.MAX_VALUE, 1, true),
+        new LongIdGeneratorCreatorAndParams(ConcurrentTwoPhaseLongIdGenerator::new, Long.MAX_VALUE, 10, true));
   }
 }

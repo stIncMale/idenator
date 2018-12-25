@@ -19,7 +19,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.StampedLock;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -34,7 +33,6 @@ import org.openjdk.jmh.runner.RunnerException;
 import stincmale.idenator.performance.util.JmhOptions;
 import stincmale.idenator.performance.util.TestTag;
 
-@Disabled
 @Tag(TestTag.PERFORMANCE)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class BaselinePerformanceTest {
@@ -43,12 +41,12 @@ public class BaselinePerformanceTest {
 
   private static final void runThroughputBenchmarks(final int numberOfThreads) throws RunnerException {
     new Runner(
-      JmhOptions.includingClass(BaselinePerformanceTest.class)
-        .mode(Mode.Throughput)
-        .timeUnit(TimeUnit.MICROSECONDS)
-        .threads(numberOfThreads)
-        .build())
-      .run();
+        JmhOptions.includingClass(BaselinePerformanceTest.class)
+            .mode(Mode.Throughput)
+            .timeUnit(TimeUnit.MICROSECONDS)
+            .threads(numberOfThreads)
+            .build())
+        .run();
   }
 
   @Test

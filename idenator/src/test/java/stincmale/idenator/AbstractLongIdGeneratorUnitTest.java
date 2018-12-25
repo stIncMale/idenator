@@ -53,7 +53,7 @@ public abstract class AbstractLongIdGeneratorUnitTest extends AbstractLongIdGene
         numberOfIdGenNextCalls++;
       }
       assertTrue(newId - id > 0, format("i=%s, numberOfIdGenNextCalls=%s, numberOfTimesLoValuesWereExhausted=%s, newId=%s, id=%s, idGen=%s",
-        i, numberOfIdGenNextCalls, numberOfTimesLoValuesWereExhausted, newId, id, idGen.toString()));
+          i, numberOfIdGenNextCalls, numberOfTimesLoValuesWereExhausted, newId, id, idGen.toString()));
       id = newId;
     }
   }

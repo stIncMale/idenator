@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project
-  xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance"
-  xmlns = "http://maven.apache.org/POM/4.0.0"
-  xsi:schemaLocation = "http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance"
+    xmlns = "http://maven.apache.org/POM/4.0.0"
+    xsi:schemaLocation = "http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <description>
     Specifies build settings (plugins, profiles, etc.).
   </description>
@@ -68,13 +68,6 @@
               --add-opens stincmale.idenator/stincmale.idenator.internal.variant=ALL-UNNAMED
             </argLine>
           </configuration>
-          <dependencies>
-            <dependency>
-              <groupId>org.ow2.asm</groupId>
-              <artifactId>asm</artifactId>
-              <version>6.2.1</version>
-            </dependency>
-          </dependencies>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -117,7 +110,7 @@
             <includeDependencySources>false</includeDependencySources>
             <includeTransitiveDependencySources>false</includeTransitiveDependencySources>
             <serialwarn>true</serialwarn>
-            <additionalparam>-Xdoclint:all</additionalparam>
+            <doclint>all</doclint>
           </configuration>
           <executions>
             <execution>

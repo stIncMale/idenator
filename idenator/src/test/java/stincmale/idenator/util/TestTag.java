@@ -21,6 +21,5 @@ public final class TestTag {
   public static final String CONCURRENCY = "concurrency";
 
   private TestTag() {
-    throw new UnsupportedOperationException("The class isn't designed to be instantiated");
   }
 }

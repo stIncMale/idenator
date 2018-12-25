@@ -52,12 +52,12 @@ public class LongIdGeneratorPerformanceTest {
 
   private static final void runThroughputBenchmarks(final int numberOfThreads) throws RunnerException {
     new Runner(
-      JmhOptions.includingClass(LongIdGeneratorPerformanceTest.class)
-        .mode(Mode.Throughput)
-        .timeUnit(TimeUnit.MICROSECONDS)
-        .threads(numberOfThreads)
-        .build())
-      .run();
+        JmhOptions.includingClass(LongIdGeneratorPerformanceTest.class)
+            .mode(Mode.Throughput)
+            .timeUnit(TimeUnit.MICROSECONDS)
+            .threads(numberOfThreads)
+            .build())
+        .run();
   }
 
   @Test
@@ -298,9 +298,9 @@ public class LongIdGeneratorPerformanceTest {
 
   private static final LongIdGenerator createIdGen(final LongIdGeneratorCreator creator, final long loUpperBoundOpen, boolean sleep) {
     return creator.create(
-      new EphemeralStrictlyIncreasingHiGenerator(0, loUpperBoundOpen - 1,
-        sleep ? new GaussianSleeper(ofMillis(8), ofMillis(2)) : NoopSleeper.instance()),
-      loUpperBoundOpen, true);
+        new EphemeralStrictlyIncreasingHiGenerator(0, loUpperBoundOpen - 1,
+            sleep ? new GaussianSleeper(ofMillis(8), ofMillis(2)) : NoopSleeper.instance()),
+        loUpperBoundOpen, true);
   }
 
   private interface LongIdGeneratorCreator {

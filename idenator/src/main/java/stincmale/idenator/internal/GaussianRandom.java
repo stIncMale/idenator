@@ -59,8 +59,8 @@ final class GaussianRandom {
   @Override
   public final String toString() {
     return getClass().getSimpleName() +
-      "{midrange=" + midrange +
-      ", absoluteDeviation=" + absoluteDeviation +
-      '}';
+        "{midrange=" + midrange +
+        ", absoluteDeviation=" + absoluteDeviation +
+        '}';
   }
 }

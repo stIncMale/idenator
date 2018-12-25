@@ -16,6 +16,7 @@
 
 package stincmale.idenator.performance.util;
 
+import static java.lang.Boolean.parseBoolean;
 import java.util.ArrayList;
 import java.util.Collection;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
@@ -24,13 +25,13 @@ import stincmale.idenator.doc.NotThreadSafe;
 
 @NotThreadSafe
 public final class JmhOptions {
+  private static final boolean DRY_RUN = parseBoolean(System.getProperty("stincmale.idenator.performance.dryRun", "false"));
   private static final boolean JAVA_SERVER = true;
-  private static final boolean JAVA_ENABLE_ASSERTIONS = false;
+  private static final boolean JAVA_ENABLE_ASSERTIONS = DRY_RUN;
   private static final boolean JAVA_DISABLE_BIASED_LOCKING = false;
   private static final boolean JAVA_DISABLE_GC = true;
 
   private JmhOptions() {
-    throw new UnsupportedOperationException();
   }
 
   public static final OptionsBuilder includingClass(final Class<?> klass) {
@@ -44,18 +45,10 @@ public final class JmhOptions {
     final Collection<String> jvmArgs = new ArrayList<>();
     jvmArgs.add("-Xfuture");
     jvmArgs.add("-Xshare:off");
-    jvmArgs.add("-Xms2096m");
-    jvmArgs.add("-Xmx2096m");
-    if (JAVA_SERVER) {
-      jvmArgs.add("-server");
-    } else {
-      jvmArgs.add("-client");
-    }
-    if (JAVA_ENABLE_ASSERTIONS) {
-      jvmArgs.add("-enableassertions");
-    } else {
-      jvmArgs.add("-disableassertions");
-    }
+    jvmArgs.add("-Xms2048m");
+    jvmArgs.add("-Xmx2048m");
+    jvmArgs.add(JAVA_SERVER ? "-server" : "-client");
+    jvmArgs.add(JAVA_ENABLE_ASSERTIONS ? "-enableassertions" : "-disableassertions");
     if (JAVA_DISABLE_BIASED_LOCKING) {
       jvmArgs.add("-XX:-UseBiasedLocking");
     }
@@ -63,17 +56,25 @@ public final class JmhOptions {
       jvmArgs.add("-XX:+UnlockExperimentalVMOptions");
       jvmArgs.add("-XX:+UseEpsilonGC");
     }
-    result.jvmArgs(jvmArgs.toArray(new String[jvmArgs.size()]))
-      .shouldDoGC(false)
-      .syncIterations(true)
-      .shouldFailOnError(true)
-      .threads(1)
-      .timeout(milliseconds(5_000));
-    result.forks(20)
-      .warmupTime(milliseconds(200))
-      .warmupIterations(10)
-      .measurementTime(milliseconds(300))
-      .measurementIterations(10);
+    result.jvmArgs(jvmArgs.toArray(new String[0]))
+        .shouldDoGC(false)
+        .syncIterations(true)
+        .shouldFailOnError(true)
+        .threads(1)
+        .timeout(milliseconds(5_000));
+    if (DRY_RUN) {
+      result.forks(1)
+          .warmupTime(milliseconds(50))
+          .warmupIterations(1)
+          .measurementTime(milliseconds(50))
+          .measurementIterations(1);
+    } else {
+      result.forks(20)
+          .warmupTime(milliseconds(200))
+          .warmupIterations(10)
+          .measurementTime(milliseconds(300))
+          .measurementIterations(10);
+    }
     return result;
   }
 }

@@ -49,10 +49,10 @@ public abstract class AbstractLongIdGeneratorTest {
     private final boolean pooled;
 
     public LongIdGeneratorCreatorAndParams(
-      final LongIdGeneratorCreator creator,
-      final long startHi,
-      final long loUpperBoundOpen,
-      final boolean pooled) {
+        final LongIdGeneratorCreator creator,
+        final long startHi,
+        final long loUpperBoundOpen,
+        final boolean pooled) {
       checkArgument(loUpperBoundOpen > 0, "loUpperBoundOpen", "Must be positive");
       this.creator = checkNotNull(creator, "creator");
       this.hiGenerator = new EphemeralStrictlyIncreasingHiGenerator(startHi, pooled ? loUpperBoundOpen - 1 : 0, NoopSleeper.instance());

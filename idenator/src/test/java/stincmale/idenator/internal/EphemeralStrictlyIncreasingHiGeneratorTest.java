@@ -20,8 +20,6 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import static stincmale.idenator.AbstractTwoPhaseLongIdGenerator.UNINITIALIZED;
-import stincmale.idenator.internal.EphemeralStrictlyIncreasingHiGenerator;
-import stincmale.idenator.internal.NoopSleeper;
 import stincmale.idenator.util.TestTag;
 
 @Tag(TestTag.UNIT)

@@ -13,45 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package stincmale.idenator.internal;
+package stincmale.idenator.performance.util;
 
 import static java.lang.Math.round;
-import java.time.Duration;
+import org.openjdk.jmh.infra.Blackhole;
 import stincmale.idenator.doc.ThreadSafe;
+import stincmale.idenator.internal.Delayer;
 import static stincmale.idenator.internal.util.Preconditions.checkArgument;
 import static stincmale.idenator.internal.util.Preconditions.checkNotNull;
 import static stincmale.idenator.internal.util.Utils.format;
 
 /**
- * A {@link Sleeper} that {@linkplain #sleep() sleeps} for a duration
- * picked by a pseudorandom generator of Gaussian distributed (but capped) durations.
+ * A {@link Delayer} that introduces a delay by performing computations with {@link Blackhole#consumeCPU(long)}
+ * for a duration roughly proportional to a number picked by a pseudorandom generator of Gaussian distributed (but capped) durations.
  */
 @ThreadSafe
-public final class GaussianSleeper implements Sleeper {
+public final class GaussianBlackHoleCpuConsumer implements Delayer {
   private final GaussianRandom rnd;
 
-  /**
-   * @param midrange The mean of min duration and max duration, i.e. (min + max) / 2. Must not be negative.
-   * @param absoluteDeviation The max absolute deviation of sleep durations from the {@code midrange}.
-   * Must not be negative. Must not be greater than {@code midrange}.
-   */
-  public GaussianSleeper(final Duration midrange, final Duration absoluteDeviation) {
+  public GaussianBlackHoleCpuConsumer(final long midrange, final long absoluteDeviation) {
     checkNotNull(midrange, "midrange");
-    checkArgument(!midrange.isNegative(), "midrange", "Must not be negative");
+    checkArgument(midrange >= 0, "midrange", "Must not be negative");
     checkNotNull(absoluteDeviation, "absoluteDeviation");
-    checkArgument(!absoluteDeviation.isNegative(), "absoluteDeviation", "Must not be negative");
-    checkArgument(absoluteDeviation.compareTo(midrange) <= 0, "absoluteDeviation",
+    checkArgument(absoluteDeviation >= 0, "absoluteDeviation", "Must not be negative");
+    checkArgument(absoluteDeviation <= midrange, "absoluteDeviation",
         () -> format("%s=%s must be less than or equal to %s=%s", "absoluteDeviation", absoluteDeviation, "midrange", midrange));
-    rnd = new GaussianRandom(midrange.toMillis(), absoluteDeviation.toMillis());
+    rnd = new GaussianRandom(midrange, absoluteDeviation);
   }
 
   @Override
-  public final void sleep() {
-    try {
-      Thread.sleep(round(rnd.next()));
-    } catch (final InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
+  public final void delay() {
+    Blackhole.consumeCPU(round(rnd.next()));
   }
 
   @Override

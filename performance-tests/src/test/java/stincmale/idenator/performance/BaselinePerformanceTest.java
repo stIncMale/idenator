@@ -19,7 +19,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.StampedLock;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.openjdk.jmh.annotations.Benchmark;
@@ -31,9 +30,36 @@ import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import stincmale.idenator.performance.util.JmhOptions;
-import stincmale.idenator.performance.util.TestTag;
 
-@Tag(TestTag.PERFORMANCE)
+/**
+ * Test environment: [single CPU] 3.4 GHz Intel Core i5 (4 cores),
+ * [OS] macOS 10.13.6 x86_64, [JDK] OpenJDK 11.0.1+13 (<a href="https://jdk.java.net/11/">a build from Oracle</a>).
+ * <pre>{@code
+ * 1 thread
+ * Benchmark                                          Mode  Cnt   Score   Error   Units
+ * BaselinePerformanceTest.synchronizedIncrement     thrpt   50   55.081 ± 0.084  ops/us (-XX:-UseBiasedLocking)
+ * BaselinePerformanceTest.synchronizedIncrement     thrpt   50  242.180 ± 0.757  ops/us
+ * BaselinePerformanceTest.reentrantRWLockIncrement  thrpt   50   57.720 ± 0.058  ops/us
+ * BaselinePerformanceTest.stampedLockIncrement      thrpt   50   60.422 ± 0.188  ops/us
+ * BaselinePerformanceTest.atomicIncrement           thrpt   50  144.278 ± 0.147  ops/us
+ *
+ * 4 threads
+ * Benchmark                                          Mode  Cnt   Score   Error   Units
+ * BaselinePerformanceTest.synchronizedIncrement     thrpt   50  18.194 ± 0.111  ops/us (-XX:-UseBiasedLocking)
+ * BaselinePerformanceTest.synchronizedIncrement     thrpt   50  20.493 ± 0.099  ops/us
+ * BaselinePerformanceTest.reentrantRWLockIncrement  thrpt   50  33.816 ± 0.519  ops/us
+ * BaselinePerformanceTest.stampedLockIncrement      thrpt   50  42.399 ± 0.668  ops/us
+ * BaselinePerformanceTest.atomicIncrement           thrpt   50  50.996 ± 0.082  ops/us
+ *
+ * 32 threads
+ * Benchmark                                          Mode  Cnt   Score   Error   Units
+ * BaselinePerformanceTest.synchronizedIncrement     thrpt   50  18.186 ± 0.106  ops/us (-XX:-UseBiasedLocking)
+ * BaselinePerformanceTest.synchronizedIncrement     thrpt   50  20.421 ± 0.128  ops/us
+ * BaselinePerformanceTest.reentrantRWLockIncrement  thrpt   50  35.563 ± 0.703  ops/us
+ * BaselinePerformanceTest.stampedLockIncrement      thrpt   50  42.527 ± 1.081  ops/us
+ * BaselinePerformanceTest.atomicIncrement           thrpt   50  51.488 ± 0.525  ops/us
+ * }</pre>
+ */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class BaselinePerformanceTest {
   public BaselinePerformanceTest() {

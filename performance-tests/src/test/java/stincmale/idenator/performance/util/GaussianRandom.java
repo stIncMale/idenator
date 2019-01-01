@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package stincmale.idenator.internal;
+package stincmale.idenator.performance.util;
 
 import java.util.concurrent.ThreadLocalRandom;
 import stincmale.idenator.doc.ThreadSafe;

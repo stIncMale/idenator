@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package stincmale.idenator.internal;
 
-package stincmale.idenator.performance.util;
-
-public final class TestTag {
-  public static final String PERFORMANCE = "performance";
-
-  private TestTag() {
-  }
+/**
+ * An object allowing to put a thread calling {@link #delay()} into {@link Thread.State#TIMED_WAITING} state
+ * for a duration decided be the implementation.
+ */
+@FunctionalInterface
+public interface Delayer {
+  void delay();
 }

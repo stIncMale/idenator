@@ -15,27 +15,45 @@
  */
 package stincmale.idenator.performance;
 
+import java.time.Duration;
 import static java.time.Duration.ofMillis;
 import java.util.concurrent.TimeUnit;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.openjdk.jmh.annotations.Benchmark;
-import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Mode;
+import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
-import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
+import stincmale.idenator.LongIdGenerator;
+import stincmale.idenator.internal.Delayer;
 import stincmale.idenator.internal.EphemeralStrictlyIncreasingHiGenerator;
-import stincmale.idenator.internal.GaussianSleeper;
+import stincmale.idenator.performance.util.GaussianBlackHoleCpuConsumer;
+import stincmale.idenator.performance.util.GaussianSleeper;
 import stincmale.idenator.performance.util.JmhOptions;
-import stincmale.idenator.performance.util.TestTag;
 
-@Disabled
-@Tag(TestTag.PERFORMANCE)
+/**
+ * Test environment: [single CPU] 3.4 GHz Intel Core i5 (4 cores),
+ * [OS] macOS 10.13.6, [JDK] OpenJDK 11.0.1+13 (<a href="https://jdk.java.net/11/">a build from Oracle</a>).
+ * <pre>{@code
+ * 1 thread
+ * Benchmark                                                              (longIdGenerator)  Mode  Cnt   Score   Error  Units
+ * EphemeralStrictlyIncreasingHiGeneratorPerformanceTest.next               constantSleeper  avgt   50   9.941 ± 0.048  ms/op
+ * EphemeralStrictlyIncreasingHiGeneratorPerformanceTest.next  constantBlackHoleCpuConsumer  avgt   50   9.981 ± 0.011  ms/op
+ *
+ * 4 threads
+ * Benchmark                                                              (longIdGenerator)  Mode  Cnt   Score   Error  Units
+ * EphemeralStrictlyIncreasingHiGeneratorPerformanceTest.next               constantSleeper  avgt   50   9.886 ± 0.062  ms/op
+ * EphemeralStrictlyIncreasingHiGeneratorPerformanceTest.next  constantBlackHoleCpuConsumer  avgt   50  10.651 ± 0.039  ms/op
+ *
+ * 32 threads
+ * Benchmark                                                              (longIdGenerator)  Mode  Cnt   Score   Error  Units
+ * EphemeralStrictlyIncreasingHiGeneratorPerformanceTest.next               constantSleeper  avgt   50   9.759 ± 0.119  ms/op
+ * EphemeralStrictlyIncreasingHiGeneratorPerformanceTest.next  constantBlackHoleCpuConsumer  avgt   50  81.673 ± 0.666  ms/op
+ * }</pre>
+ */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class EphemeralStrictlyIncreasingHiGeneratorPerformanceTest {
   public EphemeralStrictlyIncreasingHiGeneratorPerformanceTest() {
@@ -43,12 +61,17 @@ public class EphemeralStrictlyIncreasingHiGeneratorPerformanceTest {
 
   private static final void runLatencyBenchmarks(final int numberOfThreads) throws RunnerException {
     new Runner(
-      JmhOptions.includingClass(EphemeralStrictlyIncreasingHiGeneratorPerformanceTest.class)
-        .mode(Mode.AverageTime)
-        .timeUnit(TimeUnit.MILLISECONDS)
-        .threads(numberOfThreads)
-        .build())
-      .run();
+        JmhOptions.includingClass(EphemeralStrictlyIncreasingHiGeneratorPerformanceTest.class)
+            .mode(Mode.AverageTime)
+            .timeUnit(TimeUnit.MILLISECONDS)
+            .threads(numberOfThreads)
+            .build())
+        .run();
+  }
+
+  @Test
+  final void throughputThreads1() throws RunnerException {
+    runLatencyBenchmarks(1);
   }
 
   @Test
@@ -62,20 +85,34 @@ public class EphemeralStrictlyIncreasingHiGeneratorPerformanceTest {
   }
 
   @Benchmark
-  public final long next(final EphemeralStrictlyIncreasingHiGeneratorPerformanceTest.BenchmarkState state) {
-    return state.ephemeralSleepingIdGen.next();
+  public final long next(final BenchmarkState state) {
+    return state.longIdGenerator.instance.next();
   }
 
   @State(Scope.Benchmark)
   public static class BenchmarkState {
-    private EphemeralStrictlyIncreasingHiGenerator ephemeralSleepingIdGen;
+    @Param
+    private TestableLongIdGenerator longIdGenerator;
 
     public BenchmarkState() {
     }
 
-    @Setup(Level.Trial)
-    public final void setup() {
-      ephemeralSleepingIdGen = new EphemeralStrictlyIncreasingHiGenerator(0, 5, new GaussianSleeper(ofMillis(8), ofMillis(2)));
+    /**
+     * A different computer/JDK/JMH will most likely require different constructor arguments to achieve the same delays.
+     */
+    public enum TestableLongIdGenerator {
+      constantSleeper(new GaussianSleeper(ofMillis(8), Duration.ZERO)),
+      /**
+       * Obviously, the time {@link GaussianBlackHoleCpuConsumer#delay()} takes to return depends on the availability of CPU,
+       * hence measuring the delay makes sense only with a single thread.
+       */
+      constantBlackHoleCpuConsumer(new GaussianBlackHoleCpuConsumer(5_300_000, 0));
+
+      private final LongIdGenerator instance;
+
+      TestableLongIdGenerator(final Delayer delayer) {
+        instance = new EphemeralStrictlyIncreasingHiGenerator(0, 5, delayer);
+      }
     }
   }
 }

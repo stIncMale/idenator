@@ -20,7 +20,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Supplier;
 import stincmale.idenator.internal.EphemeralStrictlyIncreasingHiGenerator;
-import stincmale.idenator.internal.NoopSleeper;
+import stincmale.idenator.internal.NoopDelayer;
 import static stincmale.idenator.internal.util.Preconditions.checkArgument;
 import static stincmale.idenator.internal.util.Preconditions.checkNotNull;
 
@@ -55,7 +55,7 @@ public abstract class AbstractLongIdGeneratorTest {
         final boolean pooled) {
       checkArgument(loUpperBoundOpen > 0, "loUpperBoundOpen", "Must be positive");
       this.creator = checkNotNull(creator, "creator");
-      this.hiGenerator = new EphemeralStrictlyIncreasingHiGenerator(startHi, pooled ? loUpperBoundOpen - 1 : 0, NoopSleeper.instance());
+      this.hiGenerator = new EphemeralStrictlyIncreasingHiGenerator(startHi, pooled ? loUpperBoundOpen - 1 : 0, NoopDelayer.instance());
       this.startHi = startHi;
       this.loUpperBoundOpen = loUpperBoundOpen;
       this.pooled = pooled;

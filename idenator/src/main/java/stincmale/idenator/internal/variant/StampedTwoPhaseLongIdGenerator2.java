@@ -62,7 +62,7 @@ public final class StampedTwoPhaseLongIdGenerator2 extends AbstractTwoPhaseLongI
           if (lo >= loUpperBoundOpen) {//re-check whether we still need to reset lo and advance hi
             lo = 0;
             this.lo.set(lo);
-            hi = nextId();
+            hi = nextHi();
             this.hi = hi;
           } else {//lo is fine, but we still need to read hi under the exclusive lock to make sure that hi+lo read is atomic
             hi = this.hi;
@@ -85,7 +85,7 @@ public final class StampedTwoPhaseLongIdGenerator2 extends AbstractTwoPhaseLongI
       long exclusiveStamp = lock.writeLock();
       try {
         if (hi == UNINITIALIZED) {
-          hi = nextId();
+          hi = nextHi();
         }
       } finally {
         lock.unlockWrite(exclusiveStamp);

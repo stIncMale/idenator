@@ -29,7 +29,7 @@ final class EphemeralStrictlyIncreasingHiGeneratorTest {
   }
 
   private final static void testNext(final long startHi, final long sparseness) {
-    final EphemeralStrictlyIncreasingHiGenerator idGen = new EphemeralStrictlyIncreasingHiGenerator(startHi, sparseness, NoopSleeper.instance());
+    final EphemeralStrictlyIncreasingHiGenerator idGen = new EphemeralStrictlyIncreasingHiGenerator(startHi, sparseness, NoopDelayer.instance());
     long id = idGen.next();
     assertEquals(startHi, id);
     for (int i = 1; i < 100 * sparseness; i++) {

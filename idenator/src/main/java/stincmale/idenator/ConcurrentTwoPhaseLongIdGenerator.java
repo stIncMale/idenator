@@ -58,7 +58,7 @@ public final class ConcurrentTwoPhaseLongIdGenerator extends AbstractTwoPhaseLon
         try {
           lo = this.lo.incrementAndGet();
           if (lo >= loUpperBoundOpen) {//re-check whether we still need to reset lo and advance hi
-            hi = nextId();
+            hi = nextHi();
             this.hi = hi;
             lo = 0;
             this.lo.set(lo);
@@ -85,7 +85,7 @@ public final class ConcurrentTwoPhaseLongIdGenerator extends AbstractTwoPhaseLon
       try {
         hi = this.hi;
         if (hi == UNINITIALIZED) {
-          hi = nextId();
+          hi = nextHi();
           this.hi = hi;
         }
       } finally {

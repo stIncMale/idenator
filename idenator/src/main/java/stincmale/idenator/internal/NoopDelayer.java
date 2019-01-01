@@ -15,14 +15,31 @@
  */
 package stincmale.idenator.internal;
 
+import stincmale.idenator.doc.ThreadSafe;
+
 /**
- * An object allowing to put a thread calling {@link #sleep()} into {@link Thread.State#TIMED_WAITING} state
- * for a duration decided be the implementation.
+ * An implementation of {@link Delayer} which never puts a thread into {@link Thread.State#TIMED_WAITING} state.
  */
-@FunctionalInterface
-public interface Sleeper {
+@ThreadSafe
+public final class NoopDelayer implements Delayer {
+  private static final NoopDelayer instance = new NoopDelayer();
+
+  private NoopDelayer() {
+  }
+
   /**
-   * Puts a thread calling this method into {@link Thread.State#TIMED_WAITING} for a duration decided be the implementation.
+   * Always returns the same instance.
+   *
+   * @return An instance of {@link NoopDelayer}.
    */
-  void sleep();
+  public static final NoopDelayer instance() {
+    return instance;
+  }
+
+  /**
+   * Does nothing.
+   */
+  @Override
+  public final void delay() {
+  }
 }

@@ -39,11 +39,11 @@ public final class SynchronizedTwoPhaseLongIdGenerator2 extends AbstractTwoPhase
     final long hi;
     long lo;
     synchronized (mutex) {
-      lo = ++this.lo;//increment then assign
+      lo = ++this.lo;//increment then read
       if (lo >= loUpperBoundOpen) {//lo is too big, we need to reset lo and advance hi
         lo = 0;
         this.lo = lo;
-        hi = nextId();
+        hi = nextHi();
         this.hi = hi;
       } else {//lo is fine
         hi = initializedHi();
@@ -53,8 +53,10 @@ public final class SynchronizedTwoPhaseLongIdGenerator2 extends AbstractTwoPhase
   }
 
   private final long initializedHi() {
+    long hi = this.hi;
     if (hi == UNINITIALIZED) {
-      hi = nextId();
+      hi = nextHi();
+      this.hi = hi;
     }
     return hi;
   }

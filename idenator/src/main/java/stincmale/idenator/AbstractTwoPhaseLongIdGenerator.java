@@ -23,13 +23,13 @@ import static stincmale.idenator.internal.util.Utils.format;
 
 /**
  * This ID generator can be represented as an optimization around another ID generator (specifically {@linkplain #getHiGenerator() hiGenerator}),
- * which requires noticeable amount of resources (usually time) to produce a new identifier.
+ * which requires a noticeable amount of resources (usually time) to produce a new identifier.
  * For example, {@linkplain #getHiGenerator() hiGenerator} may need to access a persistent storage to generate a new identifier.
  * <p>
  * This ID generator maintains two values: {@code hi} and {@code lo},
  * and uses them for {@linkplain #calculateId(long, long) calculation} of a new identifier.
  * {@code Hi} values are identifiers themselves, usually take significant time to be generated and virtually unbounded.
- * {@code Lo} values are usually cheap to produce, bounded by {@linkplain #getLoUpperBoundOpen() loUpperBoundOpen},
+ * {@code Lo} values are cheap to produce, they are bounded by {@linkplain #getLoUpperBoundOpen() loUpperBoundOpen},
  * must be unique only within the same {@code hi} value.
  * <p>
  * This ID generator can work in two modes: Hi/Lo and pooled.
@@ -127,17 +127,26 @@ public abstract class AbstractTwoPhaseLongIdGenerator implements LongIdGenerator
   }
 
   /**
-   * @return The {@code hi} value generator specified via {@link #AbstractTwoPhaseLongIdGenerator(LongIdGenerator, long, boolean)}.
+   * Provides the {@code hi} value generator specified via {@link #AbstractTwoPhaseLongIdGenerator(LongIdGenerator, long, boolean)}.
+   * Subclasses should not use its {@link LongIdGenerator#next()} method to generate new {@code hi} values,
+   * method {@link #nextHi()} should be used instead.
+   *
+   * @return The {@code hi} value generator.
+   * @see #nextHi()
    */
   protected final LongIdGenerator getHiGenerator() {
     return hiGenerator;
   }
 
   /**
+   * Generates {@code hi} values by using {@link #getHiGenerator() hiGenerator}.
+   * This method uses {@link #getHiGenerator() hiGenerator}{@code .}{@link LongIdGenerator#next() next} but is not equivalent to it
+   * because it guarantees that the returned {@code hi} value is never equal to {@link AbstractTwoPhaseLongIdGenerator#UNINITIALIZED}.
+   *
    * @return The next {@code hi} value by using {@link #getHiGenerator() hiGenerator}.
    * Never returns {@link AbstractTwoPhaseLongIdGenerator#UNINITIALIZED}.
    */
-  protected final long nextId() {
+  protected final long nextHi() {
     final long id = hiGenerator.next();
     return id == UNINITIALIZED ? hiGenerator.next() : id;
   }

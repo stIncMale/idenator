@@ -28,7 +28,7 @@ import static stincmale.idenator.internal.util.Utils.format;
  */
 @NotThreadSafe
 public final class EphemeralStrictlyIncreasingHiGenerator implements LongIdGenerator {
-  private final Sleeper sleeper;
+  private final Delayer delayer;
   private final long sparseness;
   private long hi;
 
@@ -37,19 +37,19 @@ public final class EphemeralStrictlyIncreasingHiGenerator implements LongIdGener
    * Must not be equal to {@link AbstractTwoPhaseLongIdGenerator#UNINITIALIZED}.
    * @param sparseness 0 if this ID generator is not required to be sparse (see {@link stincmale.idenator}),
    * otherwise the value of a desired sparseness.
-   * @param sleeper A {@link Sleeper} allowing to emulate a delay while {@linkplain #next() generating} a {@code hi} value.
+   * @param delayer A {@link Delayer} allowing to emulate a delay while {@linkplain #next() generating} a {@code hi} value.
    */
-  public EphemeralStrictlyIncreasingHiGenerator(final long startHi, final long sparseness, final Sleeper sleeper) {
+  public EphemeralStrictlyIncreasingHiGenerator(final long startHi, final long sparseness, final Delayer delayer) {
     checkArgument(startHi != UNINITIALIZED, "startHi", () -> format("Must not be equal to %s", UNINITIALIZED));
     checkArgument(sparseness >= 0, "sparseness", "Must not be be negative");
     hi = startHi;
     this.sparseness = sparseness;
-    this.sleeper = checkNotNull(sleeper, "sleeper");
+    this.delayer = checkNotNull(delayer, "delayer");
   }
 
   @Override
   public final long next() {
-    sleeper.sleep();
+    delayer.delay();
     return getAndAdvanceHi();
   }
 
@@ -63,7 +63,7 @@ public final class EphemeralStrictlyIncreasingHiGenerator implements LongIdGener
   public final String toString() {
     return getClass().getSimpleName() +
         "{sparseness=" + sparseness +
-        ", sleeper=" + sleeper +
+        ", delayer=" + delayer +
         '}';
   }
 }

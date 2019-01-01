@@ -69,11 +69,11 @@ public final class JmhOptions {
           .measurementTime(milliseconds(50))
           .measurementIterations(1);
     } else {
-      result.forks(20)
+      result.forks(10)
           .warmupTime(milliseconds(200))
           .warmupIterations(10)
           .measurementTime(milliseconds(300))
-          .measurementIterations(10);
+          .measurementIterations(5);
     }
     return result;
   }
